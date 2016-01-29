@@ -4,9 +4,17 @@
     tools:context="org.screen.lock.draw.MainActivity" >
 
     <item
-        android:id="@+id/action_example"
-        android:title="@string/action_example"
-        app:showAsAction="withText|ifRoom"/>
+        android:id="@+id/action_open_image"
+        android:title="@string/action_open_image"
+        android:icon="@drawable/ic_open_image"
+        app:showAsAction="always"/>
+
+    <item
+        android:id="@+id/action_lock_unlock"
+        android:title="@string/action_unlock"
+        android:icon="@drawable/ic_unlock"
+        app:showAsAction="always"/>
+ 
     <item
         android:id="@+id/action_settings"
         android:orderInCategory="100"

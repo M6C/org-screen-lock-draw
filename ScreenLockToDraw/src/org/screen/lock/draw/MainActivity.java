@@ -2,6 +2,8 @@ package org.screen.lock.draw;
 
 import java.util.List;
 
+import org.screen.lock.draw.manager.LockManager;
+import org.screen.lock.draw.view.TouchImageView;
 import org.screenlocktodraw.R;
 
 import android.app.Activity;
@@ -34,7 +36,7 @@ public class MainActivity extends ActionBarActivity
 	 * {@link #restoreActionBar()}.
 	 */
 	private CharSequence mTitle;
-	private static ImageView ivMain;
+	private static TouchImageView ivMain;
 
 	private DialogFactory dialogFactory;
 
@@ -105,7 +107,20 @@ public class MainActivity extends ActionBarActivity
 		// automatically handle clicks on the Home/Up button, so long
 		// as you specify a parent activity in AndroidManifest.xml.
 		int id = item.getItemId();
-		if (id == R.id.action_settings) {
+		if (id == R.id.action_open_image) {
+			dialogFactory.showDialogChooseImageSource(this);
+			return true;
+		}
+		else if (id == R.id.action_lock_unlock) {
+			if (LockManager.getInstance().isLocked()) {
+				LockManager.getInstance().setLocked(false);
+				item.setIcon(getResources().getDrawable(R.drawable.ic_unlock));
+				lockUnLock(false);
+			} else {
+				LockManager.getInstance().setLocked(true);
+				item.setIcon(getResources().getDrawable(R.drawable.ic_lock));
+				lockUnLock(true);
+			}
 			return true;
 		}
 		return super.onOptionsItemSelected(item);
@@ -141,6 +156,11 @@ public class MainActivity extends ActionBarActivity
 	        }
 	    }
 	};
+
+	private void lockUnLock(boolean lock) {
+		ivMain.setEnabledTouchListner(!lock);
+	}
+
 	/**
 	 * A placeholder fragment containing a simple view.
 	 */
@@ -169,15 +189,14 @@ public class MainActivity extends ActionBarActivity
 		public View onCreateView(LayoutInflater inflater, ViewGroup container,
 				Bundle savedInstanceState) {
 			View rootView = inflater.inflate(R.layout.fragment_main, container, false);
-			ivMain = (ImageView) rootView.findViewById(R.id.ivMain);
+			ivMain = (TouchImageView) rootView.findViewById(R.id.ivMain);
 			return rootView;
 		}
 
 		@Override
 		public void onAttach(Activity activity) {
 			super.onAttach(activity);
-			((MainActivity) activity).onSectionAttached(
-					getArguments().getInt(ARG_SECTION_NUMBER));
+			((MainActivity) activity).onSectionAttached(getArguments().getInt(ARG_SECTION_NUMBER));
 		}
 	}
 
