@@ -8,6 +8,10 @@
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
     <string name="action_open_image">Open Image</string>
+    <string name="action_move_right">Move Right</string>
+    <string name="action_move_left">Move Left</string>
+    <string name="action_move_up">Move Up</string>
+    <string name="action_move_down">Move Down</string>
     <string name="action_lock">Lock</string>
     <string name="action_unlock">Unlock</string>
     <string name="action_settings">Settings</string>

@@ -4,6 +4,30 @@
     tools:context="org.screen.lock.draw.MainActivity" >
 
     <item
+        android:id="@+id/action_move_right"
+        android:title="@string/action_move_right"
+        android:icon="@drawable/ic_move_right"
+        app:showAsAction="always"/>
+
+    <item
+        android:id="@+id/action_move_left"
+        android:title="@string/action_move_left"
+        android:icon="@drawable/ic_move_left"
+        app:showAsAction="always"/>
+
+    <item
+        android:id="@+id/action_move_up"
+        android:title="@string/action_move_up"
+        android:icon="@drawable/ic_move_up"
+        app:showAsAction="always"/>
+
+    <item
+        android:id="@+id/action_move_down"
+        android:title="@string/action_move_down"
+        android:icon="@drawable/ic_move_down"
+        app:showAsAction="always"/>
+
+    <item
         android:id="@+id/action_open_image"
         android:title="@string/action_open_image"
         android:icon="@drawable/ic_open_image"

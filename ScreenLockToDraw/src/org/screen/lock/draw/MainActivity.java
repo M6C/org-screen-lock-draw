@@ -84,7 +84,7 @@ public class MainActivity extends ActionBarActivity
 	public void restoreActionBar() {
 		ActionBar actionBar = getSupportActionBar();
 		actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
-		actionBar.setDisplayShowTitleEnabled(true);
+		actionBar.setDisplayShowTitleEnabled(false);
 		actionBar.setTitle(mTitle);
 	}
 
@@ -121,6 +121,18 @@ public class MainActivity extends ActionBarActivity
 				item.setIcon(getResources().getDrawable(R.drawable.ic_lock));
 				lockUnLock(true);
 			}
+			return true;
+		} else if (id == R.id.action_move_right) {
+			ivMain.moveLeft(true);
+			return true;
+		} else if (id == R.id.action_move_left) {
+			ivMain.moveLeft(false);
+			return true;
+		} else if (id == R.id.action_move_up) {
+			ivMain.movedown(true);
+			return true;
+		} else if (id == R.id.action_move_down) {
+			ivMain.movedown(false);
 			return true;
 		}
 		return super.onOptionsItemSelected(item);

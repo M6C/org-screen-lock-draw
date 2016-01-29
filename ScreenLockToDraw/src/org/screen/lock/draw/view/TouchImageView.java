@@ -14,6 +14,8 @@
 package org.screen.lock.draw.view;
 
 import android.annotation.TargetApi;
+import android.app.Activity;
+import android.app.Instrumentation;
 import android.content.Context;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
@@ -28,8 +30,10 @@ import android.os.Build.VERSION;
 import android.os.Build.VERSION_CODES;
 import android.os.Bundle;
 import android.os.Parcelable;
+import android.os.SystemClock;
 import android.util.AttributeSet;
 import android.util.Log;
+import android.view.DragEvent;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
@@ -96,6 +100,7 @@ public class TouchImageView extends ImageView {
     
     private ScaleGestureDetector mScaleDetector;
     private GestureDetector mGestureDetector;
+	private PrivateOnTouchListener mPrivateOnTouchListener;
     private GestureDetector.OnDoubleTapListener doubleTapListener = null;
     private OnTouchListener userTouchListener = null;
     private OnTouchImageViewListener touchImageViewListener = null;
@@ -120,6 +125,7 @@ public class TouchImageView extends ImageView {
         this.context = context;
         mScaleDetector = new ScaleGestureDetector(context, new ScaleListener());
         mGestureDetector = new GestureDetector(context, new GestureListener());
+        mPrivateOnTouchListener = new PrivateOnTouchListener();
         matrix = new Matrix();
         prevMatrix = new Matrix();
         m = new float[9];
@@ -135,7 +141,7 @@ public class TouchImageView extends ImageView {
         setScaleType(ScaleType.MATRIX);
         setState(State.NONE);
         onDrawReady = false;
-        super.setOnTouchListener(new PrivateOnTouchListener());
+		super.setOnTouchListener(mPrivateOnTouchListener);
     }
 
     @Override
@@ -817,7 +823,31 @@ public class TouchImageView extends ImageView {
 	public void setEnabledTouchListner(boolean enabledTouchListner) {
 		this.enabledTouchListner = enabledTouchListner;
 	}
-    
+
+	public void moveLeft(boolean invert) {
+		if (isEnabledTouchListner()) {
+			return;
+		}
+		RectF zoomedRect = getZoomedRect();
+		float diff = zoomedRect.right - zoomedRect.left;
+		if (invert) {
+			diff = -diff;
+		}
+		setScrollPosition(zoomedRect.left + diff, zoomedRect.top);
+	}
+
+	public void movedown(boolean invert) {
+		if (isEnabledTouchListner()) {
+			return;
+		}
+		RectF zoomedRect = getZoomedRect();
+		float diff = zoomedRect.bottom - zoomedRect.top;
+		if (invert) {
+			diff = -diff;
+		}
+		setScrollPosition(zoomedRect.left, zoomedRect.top + diff);
+	}
+	
     /**
      * Responsible for all touch events. Handles the heavy lifting of drag and also sends
      * touch events to Scale Detector and Gesture Detector.
