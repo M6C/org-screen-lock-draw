@@ -2,6 +2,7 @@ package org.screen.lock.draw;
 
 import java.util.List;
 
+import org.screen.lock.draw.manager.HistoryManager;
 import org.screen.lock.draw.manager.LockManager;
 import org.screen.lock.draw.view.TouchImageView;
 import org.screenlocktodraw.R;
@@ -20,7 +21,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 
 public class MainActivity extends ActionBarActivity
 		implements NavigationDrawerFragment.NavigationDrawerCallbacks {
@@ -60,11 +60,19 @@ public class MainActivity extends ActionBarActivity
 
 	@Override
 	public void onNavigationDrawerItemSelected(int position) {
-		// update the main content by replacing fragments
-		FragmentManager fragmentManager = getSupportFragmentManager();
-		fragmentManager.beginTransaction()
-				.replace(R.id.container, PlaceholderFragment.newInstance(position + 1))
-				.commit();
+		if (ivMain != null) {
+			String str = HistoryManager.getInstance(getApplicationContext()).getHistory().get(position);
+			Uri uri = Uri.parse(str);
+			if (uri != null) {
+				ivMain.setImageURI(uri);
+			}
+		} else {
+			// update the main content by replacing fragments
+			FragmentManager fragmentManager = getSupportFragmentManager();
+			fragmentManager.beginTransaction()
+					.replace(R.id.container, PlaceholderFragment.newInstance(position + 1))
+					.commit();
+		}
 	}
 
 	public void onSectionAttached(int number) {
@@ -155,7 +163,9 @@ public class MainActivity extends ActionBarActivity
 		        	if (data.hasExtra("selectedItems")) {
 		        		List<Uri> str = (List<Uri>) data.getSerializableExtra("selectedItems");
 		        		if (str != null && str.size() > 0) {
-		        			ivMain.setImageURI(str.get(0));
+		        			Uri uri = str.get(0);
+		        			HistoryManager.getInstance(getApplicationContext()).addHistory(uri.toString());
+							ivMain.setImageURI(uri);
 		        		}
 		        	}
 		        }
