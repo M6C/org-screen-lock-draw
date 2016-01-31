@@ -2,6 +2,7 @@ package org.screen.lock.draw;
 
 import java.util.List;
 
+import org.screen.lock.draw.listener.OnClickSendApkListenerOk;
 import org.screen.lock.draw.manager.HistoryManager;
 import org.screen.lock.draw.manager.LockManager;
 import org.screen.lock.draw.view.TouchImageView;
@@ -11,6 +12,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.widget.DrawerLayout;
@@ -21,6 +23,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 public class MainActivity extends ActionBarActivity
 		implements NavigationDrawerFragment.NavigationDrawerCallbacks {
@@ -41,6 +44,9 @@ public class MainActivity extends ActionBarActivity
 	private DialogFactory dialogFactory;
 
 	private Menu menu;
+
+	private boolean backPressedToExitOnce = false;
+	private Toast toast = null;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -75,6 +81,24 @@ public class MainActivity extends ActionBarActivity
 					.replace(R.id.container, PlaceholderFragment.newInstance(position + 1))
 					.commit();
 		}
+	}
+	@Override
+	public void onBackPressed() {
+	    if (backPressedToExitOnce) {
+	        super.onBackPressed();
+	    } else if (this.toast == null) {
+	        this.backPressedToExitOnce = true;
+	        this.toast = Toast.makeText(this, R.string.press_again_to_exit, Toast.LENGTH_SHORT);
+	        this.toast.show();
+	        new Handler().postDelayed(new Runnable() {
+
+	            @Override
+	            public void run() {
+	                backPressedToExitOnce = false;
+	                MainActivity.this.toast = null;
+	            }
+	        }, 2000);
+	    }
 	}
 
 	public void onSectionAttached(int number) {
@@ -111,6 +135,10 @@ public class MainActivity extends ActionBarActivity
 			dialogFactory.showDialogChooseImageSource(this);
 			return true;
 		}
+		else if (id == R.id.action_share_apk) {
+			onClickSendApk(null);
+			return true;
+		}
 		else if (id == R.id.action_lock_unlock) {
 			if (LockManager.getInstance().isLocked()) {
 				LockManager.getInstance().setLocked(false);
@@ -136,6 +164,12 @@ public class MainActivity extends ActionBarActivity
 			return true;
 		}
 		return super.onOptionsItemSelected(item);
+	}
+
+	public void onClickSendApk(View view) {
+		OnClickSendApkListenerOk listener = new OnClickSendApkListenerOk(this);
+		new DialogFactory().buildOkCancelDialog(this, listener, R.string.dialog_send_apk_title, R.string.dialog_send_apk_message)
+			.show();
 	}
 
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {

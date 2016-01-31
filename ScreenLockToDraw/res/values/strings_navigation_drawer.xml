@@ -2,8 +2,9 @@
 <resources>
 
     <string name="action_clear_history">Clear History</string>
+    <string name="action_share_apk">Share Application</string>
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
     <string name="navigation_drawer_title">History</string>
-
+    
 </resources>

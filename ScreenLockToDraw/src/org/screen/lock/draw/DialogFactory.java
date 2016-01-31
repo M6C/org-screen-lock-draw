@@ -6,7 +6,10 @@ import java.util.Date;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.Dialog;
+import android.content.Context;
 import android.content.DialogInterface;
+import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Environment;
@@ -18,6 +21,17 @@ public class DialogFactory {
 	public static final int ACTION_REQUEST_CAMERA = 2;
 
     private Uri cameraPhotoURI;
+
+    // From : https://github.com/M6C/com-cameleon-common/blob/master/src/com/cameleon/common/android/factory/FactoryDialog.java
+	public Dialog buildOkCancelDialog(Context context, OnClickListener onClickOkListener, int titleId, int messageId) {
+		Context ctx = context;
+		AlertDialog.Builder builder = new AlertDialog.Builder(ctx);
+		builder.setTitle(titleId);
+		builder.setMessage(messageId);
+		builder.setPositiveButton("OK", onClickOkListener);
+		builder.setNeutralButton("Cancel", null);
+		return builder.create();
+	}
 
 	public void showDialogChooseImageSource(final Activity activity) {
 		AlertDialog.Builder builder = new AlertDialog.Builder(activity);
