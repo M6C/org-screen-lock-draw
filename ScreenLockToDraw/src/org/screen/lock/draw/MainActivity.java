@@ -28,6 +28,10 @@ import android.widget.Toast;
 public class MainActivity extends ActionBarActivity
 		implements NavigationDrawerFragment.NavigationDrawerCallbacks {
 
+	private static final String EXTRA_IMAGE_URI = "EXTRA_IMAGE_URI";
+
+	private static MainActivity activity;
+
 	/**
 	 * Fragment managing the behaviors, interactions and presentation of the
 	 * navigation drawer.
@@ -39,7 +43,7 @@ public class MainActivity extends ActionBarActivity
 	 * {@link #restoreActionBar()}.
 	 */
 	private CharSequence mTitle;
-	private static TouchImageView ivMain;
+	private TouchImageView ivMain;
 
 	private DialogFactory dialogFactory;
 
@@ -47,11 +51,20 @@ public class MainActivity extends ActionBarActivity
 
 	private boolean backPressedToExitOnce = false;
 	private Toast toast = null;
+	private static Uri uri;
+
+	private static LockManager lockManager;
+
+	public MainActivity() {
+		activity = this;
+	}
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		lockManager = LockManager.getInstance();
 		dialogFactory = new DialogFactory();
+		initialize(savedInstanceState);
 
 		setContentView(R.layout.activity_main);
 
@@ -70,7 +83,7 @@ public class MainActivity extends ActionBarActivity
 	public void onNavigationDrawerItemSelected(int position) {
 		if (ivMain != null) {
 			String str = HistoryManager.getInstance(getApplicationContext()).getHistory().get(position);
-			Uri uri = Uri.parse(str);
+			uri = Uri.parse(str);
 			if (uri != null) {
 				ivMain.setImageURI(uri);
 			}
@@ -101,6 +114,14 @@ public class MainActivity extends ActionBarActivity
 	    }
 	}
 
+	@Override
+	protected void onSaveInstanceState(Bundle outState) {
+		super.onSaveInstanceState(outState);
+		outState.putParcelable(EXTRA_IMAGE_URI, uri);
+		lockManager.onSaveInstanceState(outState);
+		
+	}
+
 	public void onSectionAttached(int number) {
 	}
 
@@ -109,6 +130,7 @@ public class MainActivity extends ActionBarActivity
 		actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
 		actionBar.setDisplayShowTitleEnabled(false);
 		actionBar.setTitle(mTitle);
+		lockUnLockMenu();
 	}
 
 	@Override
@@ -140,14 +162,14 @@ public class MainActivity extends ActionBarActivity
 			return true;
 		}
 		else if (id == R.id.action_lock_unlock) {
-			if (LockManager.getInstance().isLocked()) {
-				LockManager.getInstance().setLocked(false);
+			if (lockManager.isLocked()) {
+				lockManager.setLocked(false);
 				item.setIcon(getResources().getDrawable(R.drawable.ic_unlock));
-				lockUnLock(true);
+				lockUnLock();
 			} else {
-				LockManager.getInstance().setLocked(true);
+				lockManager.setLocked(true);
 				item.setIcon(getResources().getDrawable(R.drawable.ic_lock));
-				lockUnLock(false);
+				lockUnLock();
 			}
 			return true;
 		} else if (id == R.id.action_move_right) {
@@ -189,7 +211,7 @@ public class MainActivity extends ActionBarActivity
 		        	if (data.hasExtra("selectedItems")) {
 		        		List<Uri> str = (List<Uri>) data.getSerializableExtra("selectedItems");
 		        		if (str != null && str.size() > 0) {
-		        			Uri uri = str.get(0);
+		        			uri = str.get(0);
 		        			HistoryManager.getInstance(getApplicationContext()).addHistory(uri.toString());
 							ivMain.setImageURI(uri);
 		        		}
@@ -205,13 +227,43 @@ public class MainActivity extends ActionBarActivity
 	    }
 	};
 
-	private void lockUnLock(boolean lock) {
-		ivMain.setEnabledTouchListner(lock);
-		menu.getItem(0).setVisible(!lock);
-		menu.getItem(1).setVisible(!lock);
-		menu.getItem(2).setVisible(!lock);
-		menu.getItem(3).setVisible(!lock);
-		menu.getItem(4).setVisible(lock);
+	private void lockUnLock() {
+		boolean unLock = !lockManager.isLocked();
+		if (ivMain != null) {
+			ivMain.setEnabledTouchListner(unLock);
+		}
+		lockUnLockMenu();
+	}
+
+	private void lockUnLockMenu() {
+		boolean unLock = !lockManager.isLocked();
+		if (menu != null) {
+			menu.getItem(0).setVisible(!unLock);
+			menu.getItem(1).setVisible(!unLock);
+			menu.getItem(2).setVisible(!unLock);
+			menu.getItem(3).setVisible(!unLock);
+			menu.getItem(4).setVisible(unLock);
+			if (unLock) {
+				menu.getItem(5).setIcon(getResources().getDrawable(R.drawable.ic_unlock));
+			} else {
+				menu.getItem(5).setIcon(getResources().getDrawable(R.drawable.ic_lock));
+			}
+		}
+	}
+
+	private void initialize(Bundle bundle) {
+		if (bundle != null) {
+			uri = (Uri) bundle.getParcelable(EXTRA_IMAGE_URI);
+		}
+		lockManager.initialize(bundle);
+	}
+
+	public TouchImageView getIvMain() {
+		return ivMain;
+	}
+
+	public void setIvMain(TouchImageView ivMain) {
+		this.ivMain = ivMain;
 	}
 
 	/**
@@ -239,10 +291,13 @@ public class MainActivity extends ActionBarActivity
 		}
 
 		@Override
-		public View onCreateView(LayoutInflater inflater, ViewGroup container,
-				Bundle savedInstanceState) {
+		public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 			View rootView = inflater.inflate(R.layout.fragment_main, container, false);
-			ivMain = (TouchImageView) rootView.findViewById(R.id.ivMain);
+			activity.setIvMain((TouchImageView) rootView.findViewById(R.id.ivMain));
+			if (activity.getIvMain() != null && uri != null) {
+				activity.getIvMain().setImageURI(uri);
+			}
+			activity.lockUnLock();
 			return rootView;
 		}
 
@@ -252,5 +307,4 @@ public class MainActivity extends ActionBarActivity
 			((MainActivity) activity).onSectionAttached(getArguments().getInt(ARG_SECTION_NUMBER));
 		}
 	}
-
 }
