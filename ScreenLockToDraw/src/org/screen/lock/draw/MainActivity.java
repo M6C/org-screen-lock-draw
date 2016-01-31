@@ -40,6 +40,8 @@ public class MainActivity extends ActionBarActivity
 
 	private DialogFactory dialogFactory;
 
+	private Menu menu;
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -76,17 +78,6 @@ public class MainActivity extends ActionBarActivity
 	}
 
 	public void onSectionAttached(int number) {
-		switch (number) {
-		case 1:
-			mTitle = getString(R.string.title_section1);
-			break;
-		case 2:
-			mTitle = getString(R.string.title_section2);
-			break;
-		case 3:
-			mTitle = getString(R.string.title_section3);
-			break;
-		}
 	}
 
 	public void restoreActionBar() {
@@ -98,6 +89,7 @@ public class MainActivity extends ActionBarActivity
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
+		this.menu = menu;
 		if (!mNavigationDrawerFragment.isDrawerOpen()) {
 			// Only show items in the action bar relevant to this screen
 			// if the drawer is not showing. Otherwise, let the drawer
@@ -123,11 +115,11 @@ public class MainActivity extends ActionBarActivity
 			if (LockManager.getInstance().isLocked()) {
 				LockManager.getInstance().setLocked(false);
 				item.setIcon(getResources().getDrawable(R.drawable.ic_unlock));
-				lockUnLock(false);
+				lockUnLock(true);
 			} else {
 				LockManager.getInstance().setLocked(true);
 				item.setIcon(getResources().getDrawable(R.drawable.ic_lock));
-				lockUnLock(true);
+				lockUnLock(false);
 			}
 			return true;
 		} else if (id == R.id.action_move_right) {
@@ -180,7 +172,12 @@ public class MainActivity extends ActionBarActivity
 	};
 
 	private void lockUnLock(boolean lock) {
-		ivMain.setEnabledTouchListner(!lock);
+		ivMain.setEnabledTouchListner(lock);
+		menu.getItem(0).setVisible(!lock);
+		menu.getItem(1).setVisible(!lock);
+		menu.getItem(2).setVisible(!lock);
+		menu.getItem(3).setVisible(!lock);
+		menu.getItem(4).setVisible(lock);
 	}
 
 	/**
