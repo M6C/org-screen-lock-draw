@@ -833,7 +833,9 @@ public class TouchImageView extends ImageView {
 		if (invert) {
 			diff = -diff;
 		}
-		setScrollPosition(zoomedRect.left + diff, zoomedRect.top);
+//		setScrollPosition(zoomedRect.left + diff, zoomedRect.top);
+		zoomedRect.left = zoomedRect.left + diff;
+		setZoomedRect(zoomedRect);
 	}
 
 	public void movedown(boolean invert) {
@@ -845,9 +847,24 @@ public class TouchImageView extends ImageView {
 		if (invert) {
 			diff = -diff;
 		}
-		setScrollPosition(zoomedRect.left, zoomedRect.top + diff);
+//		setScrollPosition(zoomedRect.left, zoomedRect.top + diff);
+		zoomedRect.top = zoomedRect.top + diff;
+		setZoomedRect(zoomedRect);
 	}
-	
+
+    public void setZoomedRect(RectF rect) {
+    	PointF last = mPrivateOnTouchListener.getLast();
+    	PointF curr = new PointF(rect.left, rect.top);
+        float deltaX = curr.x - last.x;
+        float deltaY = curr.y - last.y;
+        float fixTransX = getFixDragTrans(deltaX, viewWidth, getImageWidth());
+        float fixTransY = getFixDragTrans(deltaY, viewHeight, getImageHeight());
+        matrix.postTranslate(fixTransX, fixTransY);
+        fixTrans();
+        last.set(curr.x, curr.y);
+        setScrollPosition(curr.x, curr.y);
+    }
+
     /**
      * Responsible for all touch events. Handles the heavy lifting of drag and also sends
      * touch events to Scale Detector and Gesture Detector.
@@ -920,6 +937,10 @@ public class TouchImageView extends ImageView {
             //
             return true;
         }
+
+    	public PointF getLast() {
+			return last;
+		}
     }
 
     /**
