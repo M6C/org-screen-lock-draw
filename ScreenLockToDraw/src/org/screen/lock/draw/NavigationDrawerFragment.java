@@ -3,7 +3,6 @@ package org.screen.lock.draw;
 import java.util.List;
 
 import org.screen.lock.draw.manager.HistoryManager;
-import org.screenlocktodraw.R;
 
 import android.app.Activity;
 import android.content.SharedPreferences;

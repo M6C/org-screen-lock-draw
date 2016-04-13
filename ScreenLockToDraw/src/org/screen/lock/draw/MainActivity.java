@@ -1,14 +1,17 @@
 package org.screen.lock.draw;
 
+import java.io.File;
 import java.util.List;
 
+import org.screen.lock.draw.listener.AbstractGestureListener;
 import org.screen.lock.draw.listener.OnClickSendApkListenerOk;
 import org.screen.lock.draw.manager.HistoryManager;
 import org.screen.lock.draw.manager.LockManager;
+import org.screen.lock.draw.tool.ToolUri;
 import org.screen.lock.draw.view.TouchImageView;
-import org.screenlocktodraw.R;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -18,10 +21,13 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
+import android.view.GestureDetector;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
+import android.view.View.OnTouchListener;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
@@ -29,6 +35,7 @@ public class MainActivity extends ActionBarActivity
 		implements NavigationDrawerFragment.NavigationDrawerCallbacks {
 
 	private static final String EXTRA_IMAGE_URI = "EXTRA_IMAGE_URI";
+	private static final String EXTRA_IMAGE_PATH = "EXTRA_IMAGE_PATH";
 
 	private static MainActivity activity;
 
@@ -52,6 +59,7 @@ public class MainActivity extends ActionBarActivity
 	private boolean backPressedToExitOnce = false;
 	private Toast toast = null;
 	private static Uri uri;
+	private static String path;
 
 	private static LockManager lockManager;
 
@@ -84,6 +92,7 @@ public class MainActivity extends ActionBarActivity
 		if (ivMain != null) {
 			String str = HistoryManager.getInstance(getApplicationContext()).getHistory().get(position);
 			uri = Uri.parse(str);
+			path = ToolUri.getPath(this, uri);
 			if (uri != null) {
 				ivMain.setImageURI(uri);
 			}
@@ -118,6 +127,7 @@ public class MainActivity extends ActionBarActivity
 	protected void onSaveInstanceState(Bundle outState) {
 		super.onSaveInstanceState(outState);
 		outState.putParcelable(EXTRA_IMAGE_URI, uri);
+		outState.putString(EXTRA_IMAGE_PATH, path);
 		lockManager.onSaveInstanceState(outState);
 		
 	}
@@ -212,6 +222,7 @@ public class MainActivity extends ActionBarActivity
 		        		List<Uri> str = (List<Uri>) data.getSerializableExtra("selectedItems");
 		        		if (str != null && str.size() > 0) {
 		        			uri = str.get(0);
+		        			path = ToolUri.getPath(this, uri);
 		        			HistoryManager.getInstance(getApplicationContext()).addHistory(uri.toString());
 							ivMain.setImageURI(uri);
 		        		}
@@ -226,6 +237,69 @@ public class MainActivity extends ActionBarActivity
 	        }
 	    }
 	};
+
+	private void intializeTouchListener() {
+		if (this.ivMain != null) {
+			final GestureDetector gestureDetector = new GestureDetector(this, new AbstractGestureListener(this) {
+				
+				@Override
+				protected Intent getFlingRight(Context context) {
+					Uri newUri = slideFileURI(1);
+					if (newUri != null) {
+						MainActivity.this.uri = newUri;
+						MainActivity.this.path = ToolUri.getPath(MainActivity.this, newUri);
+						MainActivity.this.ivMain.setImageURI(MainActivity.this.uri);
+					}
+					return null;
+				}
+				
+				@Override
+				protected Intent getFlingLeft(Context context) {
+					Uri newUri = slideFileURI(-1);
+					if (newUri != null) {
+						MainActivity.this.uri = newUri;
+						MainActivity.this.path = ToolUri.getPath(MainActivity.this, newUri);
+						MainActivity.this.ivMain.setImageURI(MainActivity.this.uri);
+					}
+					return null;
+				}
+
+				private Uri slideFileURI(int pos) {
+					if (uri == null || path == null) {
+						return null;
+					}
+					Uri ret = uri;
+					String dirPath = path.substring(0, path.lastIndexOf("/"));
+					File dir = new File(dirPath);
+					File[] listFile = dir.listFiles();
+					int idxFile = -1;
+					for(int i = 0 ; i<listFile.length ; i++) {
+						File file = listFile[i];
+						if (file.isFile() && file.getPath().equals(path)) {
+							idxFile = i + pos;
+							break;
+						}
+					}
+					if (idxFile >= 0 && idxFile < listFile.length) {
+						ret = ToolUri.getUri(MainActivity.this, listFile[idxFile]);
+					}
+					return ret;
+				}
+			});
+	
+			OnTouchListener onTouchListener = new View.OnTouchListener() {
+				//http://savagelook.com/blog/android/swipes-or-flings-for-navigation-in-android
+	
+				public boolean onTouch(View v, MotionEvent event) {
+			        if (gestureDetector.onTouchEvent(event)) {
+			            return true;
+			        }
+			        return false;
+			    }
+			};
+			this.ivMain.setOnTouchListener(onTouchListener);
+		}
+	}
 
 	private void lockUnLock() {
 		boolean unLock = !lockManager.isLocked();
@@ -254,6 +328,7 @@ public class MainActivity extends ActionBarActivity
 	private void initialize(Bundle bundle) {
 		if (bundle != null) {
 			uri = (Uri) bundle.getParcelable(EXTRA_IMAGE_URI);
+			path = bundle.getString(EXTRA_IMAGE_PATH);
 		}
 		lockManager.initialize(bundle);
 	}
@@ -264,6 +339,7 @@ public class MainActivity extends ActionBarActivity
 
 	public void setIvMain(TouchImageView ivMain) {
 		this.ivMain = ivMain;
+		intializeTouchListener();
 	}
 
 	/**

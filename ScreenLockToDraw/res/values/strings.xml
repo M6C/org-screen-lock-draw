@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="app_name">ScreenLockToDraw</string>
+    <string name="app_name">Screen Lock To Draw</string>
     <string name="action_open_image">Open Image</string>
     <string name="action_move_right">Move Right</string>
     <string name="action_move_left">Move Left</string>

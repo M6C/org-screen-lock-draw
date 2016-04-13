@@ -14,8 +14,6 @@
 package org.screen.lock.draw.view;
 
 import android.annotation.TargetApi;
-import android.app.Activity;
-import android.app.Instrumentation;
 import android.content.Context;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
@@ -30,10 +28,8 @@ import android.os.Build.VERSION;
 import android.os.Build.VERSION_CODES;
 import android.os.Bundle;
 import android.os.Parcelable;
-import android.os.SystemClock;
 import android.util.AttributeSet;
 import android.util.Log;
-import android.view.DragEvent;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
