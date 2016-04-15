@@ -268,6 +268,9 @@ public class MainActivity extends ActionBarActivity
 					if (uri == null || path == null) {
 						return null;
 					}
+					if (MainActivity.this.ivMain.isZoomed) {
+						return null;
+					}
 					Uri ret = uri;
 					String dirPath = path.substring(0, path.lastIndexOf("/"));
 					File dir = new File(dirPath);
