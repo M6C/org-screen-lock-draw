@@ -268,7 +268,7 @@ public class MainActivity extends ActionBarActivity
 					if (uri == null || path == null) {
 						return null;
 					}
-					if (MainActivity.this.ivMain.isZoomed) {
+					if (MainActivity.this.ivMain.isZoomed()) {
 						return null;
 					}
 					Uri ret = uri;
