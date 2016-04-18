@@ -10,6 +10,8 @@ import org.screen.lock.draw.manager.LockManager;
 import org.screen.lock.draw.tool.ToolUri;
 import org.screen.lock.draw.view.TouchImageView;
 
+import com.androidquery.AQuery;
+
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
@@ -228,7 +230,8 @@ public class MainActivity extends ActionBarActivity
 		        break;
 	
 		        case DialogFactory.ACTION_REQUEST_CAMERA: {
-		        	ivMain.setImageURI(dialogFactory.getCameraPhotoURI());
+//		        	ivMain.setImageURI(dialogFactory.getCameraPhotoURI());
+		        	setImage(dialogFactory.getCameraPhotoURI(), true, true);
 		        }
 		        break;          
 	        }
@@ -244,7 +247,8 @@ public class MainActivity extends ActionBarActivity
 		if (hitoryze) {
 			HistoryManager.getInstance(getApplicationContext()).addHistory(uri.toString());
 		}
-		ivMain.setImageURI(uri);
+//		ivMain.setImageURI(uri);
+    	new AQuery(this).id(ivMain).progress(R.id.progress).image(ToolUri.getPath(this, uri));
 	};
 
 	private void intializeTouchListener() {
