@@ -14,6 +14,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.Fragment;
@@ -60,6 +61,8 @@ public class MainActivity extends ActionBarActivity
 	private Toast toast = null;
 	private static Uri uri;
 	private static String path;
+	private File[] listFiles = null;
+    private int idxFile;
 
 	private static LockManager lockManager;
 
@@ -91,11 +94,8 @@ public class MainActivity extends ActionBarActivity
 	public void onNavigationDrawerItemSelected(int position) {
 		if (ivMain != null) {
 			String str = HistoryManager.getInstance(getApplicationContext()).getHistory().get(position);
-			uri = Uri.parse(str);
-			path = ToolUri.getPath(this, uri);
-			if (uri != null) {
-				ivMain.setImageURI(uri);
-			}
+			Uri newUri = Uri.parse(str);
+			setImage(newUri, false, true);
 		} else {
 			// update the main content by replacing fragments
 			FragmentManager fragmentManager = getSupportFragmentManager();
@@ -221,10 +221,7 @@ public class MainActivity extends ActionBarActivity
 		        	if (data.hasExtra("selectedItems")) {
 		        		List<Uri> str = (List<Uri>) data.getSerializableExtra("selectedItems");
 		        		if (str != null && str.size() > 0) {
-		        			uri = str.get(0);
-		        			path = ToolUri.getPath(this, uri);
-		        			HistoryManager.getInstance(getApplicationContext()).addHistory(uri.toString());
-							ivMain.setImageURI(uri);
+		        			setImage(str.get(0), true, true);
 		        		}
 		        	}
 		        }
@@ -236,6 +233,18 @@ public class MainActivity extends ActionBarActivity
 		        break;          
 	        }
 	    }
+	}
+
+	private void setImage(Uri newUri, boolean hitoryze, boolean updListFile) {
+		uri = newUri;
+		path = ToolUri.getPath(this, uri);
+		if ((updListFile || listFiles == null) && path != null) {
+			new UpdateListFileTask().execute();
+		}
+		if (hitoryze) {
+			HistoryManager.getInstance(getApplicationContext()).addHistory(uri.toString());
+		}
+		ivMain.setImageURI(uri);
 	};
 
 	private void intializeTouchListener() {
@@ -244,49 +253,32 @@ public class MainActivity extends ActionBarActivity
 				
 				@Override
 				protected Intent getFlingRight(Context context) {
-					Uri newUri = slideFileURI(1);
-					if (newUri != null) {
-						MainActivity.this.uri = newUri;
-						MainActivity.this.path = ToolUri.getPath(MainActivity.this, newUri);
-						MainActivity.this.ivMain.setImageURI(MainActivity.this.uri);
-					}
+					slideFileURI(1);
 					return null;
 				}
 				
 				@Override
 				protected Intent getFlingLeft(Context context) {
-					Uri newUri = slideFileURI(-1);
-					if (newUri != null) {
-						MainActivity.this.uri = newUri;
-						MainActivity.this.path = ToolUri.getPath(MainActivity.this, newUri);
-						MainActivity.this.ivMain.setImageURI(MainActivity.this.uri);
-					}
+					slideFileURI(-1);
 					return null;
 				}
 
-				private Uri slideFileURI(int pos) {
+				private void slideFileURI(int pos) {
 					if (uri == null || path == null) {
-						return null;
+						return;
 					}
 					if (MainActivity.this.ivMain.isZoomed()) {
-						return null;
+						return;
 					}
 					Uri ret = uri;
-					String dirPath = path.substring(0, path.lastIndexOf("/"));
-					File dir = new File(dirPath);
-					File[] listFile = dir.listFiles();
-					int idxFile = -1;
-					for(int i = 0 ; i<listFile.length ; i++) {
-						File file = listFile[i];
-						if (file.isFile() && file.getPath().equals(path)) {
-							idxFile = i + pos;
-							break;
-						}
+					int idx = idxFile + pos;
+					if (idx >= 0 && idx < listFiles.length) {
+						ret = ToolUri.getUri(MainActivity.this, listFiles[idx]);
 					}
-					if (idxFile >= 0 && idxFile < listFile.length) {
-						ret = ToolUri.getUri(MainActivity.this, listFile[idxFile]);
+					if (ret != null) {
+						setImage(ret, false, false);
+						idxFile = idx;
 					}
-					return ret;
 				}
 			});
 	
@@ -374,7 +366,7 @@ public class MainActivity extends ActionBarActivity
 			View rootView = inflater.inflate(R.layout.fragment_main, container, false);
 			activity.setIvMain((TouchImageView) rootView.findViewById(R.id.ivMain));
 			if (activity.getIvMain() != null && uri != null) {
-				activity.getIvMain().setImageURI(uri);
+				activity.setImage(uri, false, true);
 			}
 			activity.lockUnLock();
 			return rootView;
@@ -384,6 +376,24 @@ public class MainActivity extends ActionBarActivity
 		public void onAttach(Activity activity) {
 			super.onAttach(activity);
 			((MainActivity) activity).onSectionAttached(getArguments().getInt(ARG_SECTION_NUMBER));
+		}
+	}
+
+	private final class UpdateListFileTask extends AsyncTask<Void, Void, Void> {
+		@Override
+		protected Void doInBackground(Void... params) {
+			idxFile = -1;
+			String dirPath = path.substring(0, path.lastIndexOf("/"));
+			File dir = new File(dirPath);
+			listFiles = dir.listFiles();
+			for(int i = 0 ; i<listFiles.length ; i++) {
+				File file = listFiles[i];
+				if (file.isFile() && file.getPath().equals(path)) {
+					idxFile = i;
+					break;
+				}
+			}
+			return null;
 		}
 	}
 }
