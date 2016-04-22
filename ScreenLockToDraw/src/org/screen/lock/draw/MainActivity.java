@@ -2,17 +2,23 @@ package org.screen.lock.draw;
 
 import java.io.File;
 import java.util.List;
+import java.util.concurrent.CountDownLatch;
 
 import org.screen.lock.draw.listener.AbstractGestureListener;
 import org.screen.lock.draw.listener.OnClickSendApkListenerOk;
 import org.screen.lock.draw.manager.HistoryManager;
 import org.screen.lock.draw.manager.LockManager;
+import org.screen.lock.draw.tool.ToolImage;
+import org.screen.lock.draw.tool.ToolImage.Direction;
 import org.screen.lock.draw.tool.ToolUri;
 import org.screen.lock.draw.view.TouchImageView;
 
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.drawable.AnimationDrawable;
+import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -168,7 +174,15 @@ public class MainActivity extends ActionBarActivity
 		// automatically handle clicks on the Home/Up button, so long
 		// as you specify a parent activity in AndroidManifest.xml.
 		int id = item.getItemId();
-		if (id == R.id.action_open_image) {
+		if (id == R.id.action_rotate_left) {
+			rotateLeft();
+			return true;
+		}
+		else if (id == R.id.action_rotate_right) {
+			rotateRight();
+			return true;
+		}
+		else if (id == R.id.action_open_image) {
 			dialogFactory.showDialogChooseImageSource(this);
 			return true;
 		}
@@ -241,20 +255,44 @@ public class MainActivity extends ActionBarActivity
 	    }
 	}
 
-	private void setImage(Uri newUri, boolean hitoryze, boolean updListFile) {
+	private void setImage(Uri newUri, final boolean hitoryze, final boolean updListFile) {
 		uri = newUri;
 		path = ToolUri.getPath(this, uri);
-		if ((updListFile || listFiles == null) && path != null) {
-			new UpdateListFileTask().execute();
-		}
-		if (hitoryze) {
-			HistoryManager.getInstance(getApplicationContext()).addHistory(uri.toString());
-		}
-		String url = ToolUri.getPath(this, uri);
-		boolean cache = url.startsWith("http://") || url.startsWith("https://");
-		boolean exist = aq.getCachedFile(url) != null;
-		log("setImage - url:" + url + " Cache(Exist:" + exist + ",Put:" + cache + ")");
-		aq.id(ivMain).progress(R.id.progress).image(url);
+		new AsyncTask<Void, Void, String>() {
+
+			@Override
+			protected void onPreExecute() {
+				super.onPreExecute();
+				startProgress();
+			}
+
+			@Override
+			protected String doInBackground(Void... params) {
+				if ((updListFile || listFiles == null) && path != null) {
+					new UpdateListFileTask().execute();
+				}
+				if (hitoryze) {
+					HistoryManager.getInstance(getApplicationContext()).addHistory(uri.toString());
+				}
+				return ToolUri.getPath(MainActivity.this, uri);
+			}
+
+			@Override
+			protected void onPostExecute(String url) {
+				boolean cache = url.startsWith("http://") || url.startsWith("https://");
+				boolean exist = aq.getCachedFile(url) != null;
+				log("setImage - url:" + url + " Cache(Exist:" + exist + ",Put:" + cache + ")");
+
+				ivMain.setImageURI(uri);
+				ivMain.postDelayed(new Runnable() {
+					@Override
+					public void run() {
+						stopProgress();
+					}
+				}, 1000);
+				super.onPostExecute(url);
+			}
+		}.execute();
 	};
 
 	private void intializeTouchListener() {
@@ -322,12 +360,51 @@ public class MainActivity extends ActionBarActivity
 			menu.getItem(2).setVisible(!unLock);
 			menu.getItem(3).setVisible(!unLock);
 			menu.getItem(4).setVisible(unLock);
+			menu.getItem(5).setVisible(unLock);
+			menu.getItem(6).setVisible(unLock);
 			if (unLock) {
-				menu.getItem(5).setIcon(getResources().getDrawable(R.drawable.ic_unlock));
+				menu.getItem(7).setIcon(getResources().getDrawable(R.drawable.ic_unlock));
 			} else {
-				menu.getItem(5).setIcon(getResources().getDrawable(R.drawable.ic_lock));
+				menu.getItem(7).setIcon(getResources().getDrawable(R.drawable.ic_lock));
 			}
 		}
+	}
+
+	private void rotateRight() {
+		rotate(90f);
+	}
+
+	private void rotateLeft() {
+		rotate(-90f);
+	}
+
+	private void rotate(final float degrees) {
+		new AsyncTask<Void, Void, Bitmap>() {
+
+			@Override
+			protected void onPreExecute() {
+				super.onPreExecute();
+				startProgress();
+			}
+
+			@Override
+			protected Bitmap doInBackground(Void... params) {
+				Bitmap bmp = ((BitmapDrawable)ivMain.getDrawable()).getBitmap();
+				return ToolImage.process(bmp, degrees, 1f, Direction.HORIZONTAL);
+			}
+
+			@Override
+			protected void onPostExecute(Bitmap bmp) {
+				ivMain.setImageBitmap(bmp);
+				ivMain.postDelayed(new Runnable() {
+					@Override
+					public void run() {
+						stopProgress();
+					}
+				}, 1000);
+				super.onPostExecute(bmp);
+			}
+		}.execute();
 	}
 
 	private void initialize(Bundle bundle) {
@@ -336,6 +413,18 @@ public class MainActivity extends ActionBarActivity
 			path = bundle.getString(EXTRA_IMAGE_PATH);
 		}
 		lockManager.initialize(bundle);
+	}
+
+	private void startProgress() {
+		aq.id(R.id.ll_progress).visibility(View.VISIBLE);
+		aq.id(R.id.ll_content).visibility(View.INVISIBLE);
+		((AnimationDrawable)aq.id(R.id.progress_view).getImageView().getBackground()).start();
+	}
+
+	private void stopProgress() {
+		aq.id(R.id.ll_progress).visibility(View.GONE);
+		aq.id(R.id.ll_content).visibility(View.VISIBLE);
+		((AnimationDrawable)aq.id(R.id.progress_view).getImageView().getBackground()).stop();
 	}
 
 	private void log(String text) {

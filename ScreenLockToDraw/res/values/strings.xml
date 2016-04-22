@@ -2,6 +2,8 @@
 <resources>
 
     <string name="app_name">Screen Lock To Draw</string>
+    <string name="action_rotate_left">Rotate Left</string>
+    <string name="action_rotate_right">Rotate Right</string>
     <string name="action_open_image">Open Image</string>
     <string name="action_move_right">Move Right</string>
     <string name="action_move_left">Move Left</string>

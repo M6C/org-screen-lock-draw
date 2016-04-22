@@ -27,15 +27,24 @@
          The drawer is given a fixed width in dp and extends the full height of
          the container.
     -->
-
+<!-- 
 <ProgressBar        
+android:id="@+id/progress" 
 android:layout_width="15dip"       
 android:layout_height="15dip"
-android:id="@+id/progress" 
 android:layout_centerInParent="true"
 android:visibility="gone"
+/> -->
+<!--
+<ImageView
+android:id="@+id/progress_view" 
+android:layout_width="15dip"       
+android:layout_height="15dip"
+android:layout_centerInParent="true"
+android:background="@drawable/loader_animation"
+android:visibility="gone"
 />
-
+-->
     <fragment
         android:id="@+id/navigation_drawer"
         android:name="org.screen.lock.draw.NavigationDrawerFragment"

@@ -32,11 +32,23 @@
         app:showAsAction="always"/>
 
     <item
+        android:id="@+id/action_rotate_left"
+        android:title="@string/action_rotate_left"
+        android:icon="@drawable/ic_rotate_left"
+        app:showAsAction="always"/>
+
+    <item
+        android:id="@+id/action_rotate_right"
+        android:title="@string/action_rotate_right"
+        android:icon="@drawable/ic_rotate_right"
+        app:showAsAction="always"/>
+    
+    <item
         android:id="@+id/action_open_image"
         android:title="@string/action_open_image"
         android:icon="@drawable/ic_open_image"
         app:showAsAction="always"/>
-
+    
     <item
         android:id="@+id/action_lock_unlock"
         android:title="@string/action_unlock"

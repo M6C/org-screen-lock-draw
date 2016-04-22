@@ -13,10 +13,6 @@
 
 package org.screen.lock.draw.view;
 
-import org.screen.lock.draw.tool.ToolUri;
-
-import com.androidquery.AQuery;
-
 import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.res.Configuration;
@@ -167,8 +163,8 @@ public class TouchImageView extends ImageView {
     @Override
     public void setImageBitmap(Bitmap bm) {
     	super.setImageBitmap(bm);
-    	savePreviousImageValues();
-    	fitImageToView();
+//    	savePreviousImageValues();
+//    	fitImageToView();
     }
     
     @Override
