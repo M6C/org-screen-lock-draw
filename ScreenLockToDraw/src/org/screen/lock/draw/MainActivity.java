@@ -10,8 +10,6 @@ import org.screen.lock.draw.manager.LockManager;
 import org.screen.lock.draw.tool.ToolUri;
 import org.screen.lock.draw.view.TouchImageView;
 
-import com.androidquery.AQuery;
-
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
@@ -34,6 +32,8 @@ import android.view.View.OnTouchListener;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
+import com.androidquery.AQuery;
+
 public class MainActivity extends ActionBarActivity
 		implements NavigationDrawerFragment.NavigationDrawerCallbacks {
 
@@ -41,6 +41,7 @@ public class MainActivity extends ActionBarActivity
 	private static final String EXTRA_IMAGE_PATH = "EXTRA_IMAGE_PATH";
 
 	private static MainActivity activity;
+	private AQuery aq;
 
 	/**
 	 * Fragment managing the behaviors, interactions and presentation of the
@@ -81,7 +82,9 @@ public class MainActivity extends ActionBarActivity
 
 		setContentView(R.layout.activity_main);
 
-		mNavigationDrawerFragment = (NavigationDrawerFragment)
+    	aq = new AQuery(this);
+
+    	mNavigationDrawerFragment = (NavigationDrawerFragment)
 				getSupportFragmentManager().findFragmentById(R.id.navigation_drawer);
 		mTitle = getTitle();
 
@@ -247,8 +250,11 @@ public class MainActivity extends ActionBarActivity
 		if (hitoryze) {
 			HistoryManager.getInstance(getApplicationContext()).addHistory(uri.toString());
 		}
-//		ivMain.setImageURI(uri);
-    	new AQuery(this).id(ivMain).progress(R.id.progress).image(ToolUri.getPath(this, uri));
+		String url = ToolUri.getPath(this, uri);
+		boolean cache = url.startsWith("http://") || url.startsWith("https://");
+		boolean exist = aq.getCachedFile(url) != null;
+		log("setImage - url:" + url + " Cache(Exist:" + exist + ",Put:" + cache + ")");
+		aq.id(ivMain).progress(R.id.progress).image(url);
 	};
 
 	private void intializeTouchListener() {
@@ -332,6 +338,10 @@ public class MainActivity extends ActionBarActivity
 		lockManager.initialize(bundle);
 	}
 
+	private void log(String text) {
+		System.out.println(text);
+	}
+
 	public TouchImageView getIvMain() {
 		return ivMain;
 	}
@@ -390,6 +400,9 @@ public class MainActivity extends ActionBarActivity
 			String dirPath = path.substring(0, path.lastIndexOf("/"));
 			File dir = new File(dirPath);
 			listFiles = dir.listFiles();
+			if (listFiles == null) {
+				return null;
+			}
 			for(int i = 0 ; i<listFiles.length ; i++) {
 				File file = listFiles[i];
 				if (file.isFile() && file.getPath().equals(path)) {
