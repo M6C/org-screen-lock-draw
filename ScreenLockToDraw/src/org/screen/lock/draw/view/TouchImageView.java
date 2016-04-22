@@ -824,6 +824,9 @@ public class TouchImageView extends ImageView {
 		if (isEnabledTouchListner()) {
 			return;
 		}
+		if (getDrawable() == null) {
+			return;
+		}
 		RectF zoomedRect = getZoomedRect();
 		float diff = zoomedRect.right - zoomedRect.left;
 		if (invert) {
@@ -836,6 +839,9 @@ public class TouchImageView extends ImageView {
 
 	public void movedown(boolean invert) {
 		if (isEnabledTouchListner()) {
+			return;
+		}
+		if (getDrawable() == null) {
 			return;
 		}
 		RectF zoomedRect = getZoomedRect();

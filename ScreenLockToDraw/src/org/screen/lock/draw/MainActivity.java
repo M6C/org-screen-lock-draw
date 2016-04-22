@@ -389,19 +389,27 @@ public class MainActivity extends ActionBarActivity
 
 			@Override
 			protected Bitmap doInBackground(Void... params) {
-				Bitmap bmp = ((BitmapDrawable)ivMain.getDrawable()).getBitmap();
-				return ToolImage.process(bmp, degrees, 1f, Direction.HORIZONTAL);
+				Bitmap ret = null;
+				if (ivMain.getDrawable() != null) {
+					Bitmap bmp = ((BitmapDrawable)ivMain.getDrawable()).getBitmap();
+					ret = ToolImage.process(bmp, degrees, 1f, Direction.HORIZONTAL);
+				}
+				return ret;
 			}
 
 			@Override
 			protected void onPostExecute(Bitmap bmp) {
-				ivMain.setImageBitmap(bmp);
-				ivMain.postDelayed(new Runnable() {
-					@Override
-					public void run() {
-						stopProgress();
-					}
-				}, 1000);
+				if (bmp != null) {
+					ivMain.setImageBitmap(bmp);
+					ivMain.postDelayed(new Runnable() {
+						@Override
+						public void run() {
+							stopProgress();
+						}
+					}, 1000);
+				} else {
+					stopProgress();
+				}
 				super.onPostExecute(bmp);
 			}
 		}.execute();
