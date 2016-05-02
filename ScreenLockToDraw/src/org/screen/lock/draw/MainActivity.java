@@ -84,9 +84,10 @@ public class MainActivity extends ActionBarActivity
 		super.onCreate(savedInstanceState);
 		lockManager = LockManager.getInstance();
 		dialogFactory = new DialogFactory();
-		initialize(savedInstanceState);
 
 		setContentView(R.layout.activity_main);
+
+		initialize(savedInstanceState);
 
     	aq = new AQuery(this);
 
@@ -99,6 +100,14 @@ public class MainActivity extends ActionBarActivity
 				dialogFactory,
 				R.id.navigation_drawer,
 				(DrawerLayout) findViewById(R.id.drawer_layout));
+	}
+
+	@Override
+	protected void onResume() {
+		super.onResume();
+		if (uri != null) {
+			setImage(uri, true, true);
+		}
 	}
 
 	@Override
@@ -279,8 +288,8 @@ public class MainActivity extends ActionBarActivity
 
 			@Override
 			protected void onPostExecute(String url) {
-				boolean cache = url.startsWith("http://") || url.startsWith("https://");
-				boolean exist = aq.getCachedFile(url) != null;
+				boolean cache = (url == null) ? false : url.startsWith("http://") || url.startsWith("https://");
+				boolean exist = (url == null) ? false : aq.getCachedFile(url) != null;
 				log("setImage - url:" + url + " Cache(Exist:" + exist + ",Put:" + cache + ")");
 
 				ivMain.setImageURI(uri);
@@ -419,20 +428,29 @@ public class MainActivity extends ActionBarActivity
 		if (bundle != null) {
 			uri = (Uri) bundle.getParcelable(EXTRA_IMAGE_URI);
 			path = bundle.getString(EXTRA_IMAGE_PATH);
-		}
+		} else {
+			Intent intent = getIntent();
+			if (intent.getType() != null && intent.getData() != null && intent.getType().indexOf("image/") != -1) {
+				uri = intent.getData();
+			}
+	    }
 		lockManager.initialize(bundle);
 	}
 
 	private void startProgress() {
 		aq.id(R.id.ll_progress).visibility(View.VISIBLE);
 		aq.id(R.id.ll_content).visibility(View.INVISIBLE);
-		((AnimationDrawable)aq.id(R.id.progress_view).getImageView().getBackground()).start();
+		if (aq.id(R.id.progress_view) != null && aq.id(R.id.progress_view).getImageView() != null) {
+			((AnimationDrawable)aq.id(R.id.progress_view).getImageView().getBackground()).start();
+		}
 	}
 
 	private void stopProgress() {
 		aq.id(R.id.ll_progress).visibility(View.GONE);
 		aq.id(R.id.ll_content).visibility(View.VISIBLE);
-		((AnimationDrawable)aq.id(R.id.progress_view).getImageView().getBackground()).stop();
+		if (aq.id(R.id.progress_view) != null && aq.id(R.id.progress_view).getImageView() != null) {
+			((AnimationDrawable)aq.id(R.id.progress_view).getImageView().getBackground()).stop();
+		}
 	}
 
 	private void log(String text) {
