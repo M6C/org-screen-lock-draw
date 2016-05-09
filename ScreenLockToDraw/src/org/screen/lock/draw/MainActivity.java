@@ -1,11 +1,16 @@
 package org.screen.lock.draw;
 
 import java.io.File;
+import java.net.MalformedURLException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
-import java.util.concurrent.CountDownLatch;
+import java.util.Locale;
 
 import org.screen.lock.draw.listener.AbstractGestureListener;
 import org.screen.lock.draw.listener.OnClickSendApkListenerOk;
+import org.screen.lock.draw.manager.FilterManager;
 import org.screen.lock.draw.manager.HistoryManager;
 import org.screen.lock.draw.manager.LockManager;
 import org.screen.lock.draw.tool.ToolImage;
@@ -36,6 +41,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnTouchListener;
 import android.view.ViewGroup;
+import android.webkit.MimeTypeMap;
 import android.widget.Toast;
 
 import com.androidquery.AQuery;
@@ -45,6 +51,7 @@ public class MainActivity extends ActionBarActivity
 
 	private static final String EXTRA_IMAGE_URI = "EXTRA_IMAGE_URI";
 	private static final String EXTRA_IMAGE_PATH = "EXTRA_IMAGE_PATH";
+	private static final String EXTRA_FROM_CREATE = "EXTRA_FROM_CREATE";
 
 	private static MainActivity activity;
 	private AQuery aq;
@@ -67,6 +74,7 @@ public class MainActivity extends ActionBarActivity
 	private Menu menu;
 
 	private boolean backPressedToExitOnce = false;
+	private boolean fromCreate = true;
 	private Toast toast = null;
 	private static Uri uri;
 	private static String path;
@@ -74,6 +82,7 @@ public class MainActivity extends ActionBarActivity
     private int idxFile;
 
 	private static LockManager lockManager;
+	private static FilterManager filterManager;
 
 	public MainActivity() {
 		activity = this;
@@ -83,6 +92,7 @@ public class MainActivity extends ActionBarActivity
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		lockManager = LockManager.getInstance();
+		filterManager = FilterManager.getInstance();
 		dialogFactory = new DialogFactory();
 
 		setContentView(R.layout.activity_main);
@@ -106,8 +116,11 @@ public class MainActivity extends ActionBarActivity
 	protected void onResume() {
 		super.onResume();
 		if (uri != null) {
-			setImage(uri, true, true);
+			setImage(uri, fromCreate, true);
 		}
+		int idText = filterManager.isFiltred() ? R.string.action_filter_on : R.string.action_filter_off;
+		aq.id(R.id.action_filter).text(idText);
+		fromCreate = false;
 	}
 
 	@Override
@@ -127,7 +140,7 @@ public class MainActivity extends ActionBarActivity
 	@Override
 	public void onBackPressed() {
 	    if (backPressedToExitOnce) {
-	        super.onBackPressed();
+	    	finish();
 	    } else if (this.toast == null) {
 	        this.backPressedToExitOnce = true;
 	        this.toast = Toast.makeText(this, R.string.press_again_to_exit, Toast.LENGTH_SHORT);
@@ -146,10 +159,13 @@ public class MainActivity extends ActionBarActivity
 	@Override
 	protected void onSaveInstanceState(Bundle outState) {
 		super.onSaveInstanceState(outState);
-		outState.putParcelable(EXTRA_IMAGE_URI, uri);
-		outState.putString(EXTRA_IMAGE_PATH, path);
-		lockManager.onSaveInstanceState(outState);
-		
+		if (!backPressedToExitOnce) {
+			outState.putParcelable(EXTRA_IMAGE_URI, uri);
+			outState.putString(EXTRA_IMAGE_PATH, path);
+			outState.putBoolean(EXTRA_FROM_CREATE, fromCreate);
+			lockManager.onSaveInstanceState(outState);
+			filterManager.onSaveInstanceState(outState);
+		}
 	}
 
 	public void onSectionAttached(int number) {
@@ -197,6 +213,17 @@ public class MainActivity extends ActionBarActivity
 		}
 		else if (id == R.id.action_share_apk) {
 			onClickSendApk(null);
+			return true;
+		}
+		else if (id == R.id.action_filter) {
+			if (filterManager.isFiltred()) {
+				filterManager.setFiltred(false);
+				item.setTitle(getString(R.string.action_filter_off));
+			} else {
+				filterManager.setFiltred(true);
+				item.setTitle(getString(R.string.action_filter_on));
+			}
+			setImage(uri, false, true);
 			return true;
 		}
 		else if (id == R.id.action_lock_unlock) {
@@ -327,11 +354,20 @@ public class MainActivity extends ActionBarActivity
 					if (MainActivity.this.ivMain.isZoomed()) {
 						return;
 					}
-					Uri ret = uri;
-					int idx = idxFile + pos;
-					if (idx >= 0 && idx < listFiles.length) {
-						ret = ToolUri.getUri(MainActivity.this, listFiles[idx]);
+					if (listFiles == null || listFiles.length == 0) {
+						return;
 					}
+
+					int idx = idxFile + pos;
+					if (idx < 0) {
+						idx = listFiles.length - 1;
+					}
+					if (idx >= listFiles.length) {
+						idx = 0;
+					}
+
+					Uri ret = ToolUri.getUri(MainActivity.this, listFiles[idx]);
+					log("-listFiles["+idx+"]:" + listFiles[idx] + " pos:"+pos+" uri:" + ((ret == null) ? ret : ret.toString()));
 					if (ret != null) {
 						setImage(ret, false, false);
 						idxFile = idx;
@@ -428,6 +464,7 @@ public class MainActivity extends ActionBarActivity
 		if (bundle != null) {
 			uri = (Uri) bundle.getParcelable(EXTRA_IMAGE_URI);
 			path = bundle.getString(EXTRA_IMAGE_PATH);
+			fromCreate = bundle.getBoolean(EXTRA_FROM_CREATE);
 		} else {
 			Intent intent = getIntent();
 			if (intent.getType() != null && intent.getData() != null && intent.getType().indexOf("image/") != -1) {
@@ -435,6 +472,7 @@ public class MainActivity extends ActionBarActivity
 			}
 	    }
 		lockManager.initialize(bundle);
+		filterManager.initialize(bundle);
 	}
 
 	private void startProgress() {
@@ -514,9 +552,15 @@ public class MainActivity extends ActionBarActivity
 			idxFile = -1;
 			String dirPath = path.substring(0, path.lastIndexOf("/"));
 			File dir = new File(dirPath);
-			listFiles = dir.listFiles();
-			if (listFiles == null) {
+			File[] list = dir.listFiles();
+			if (list == null) {
 				return null;
+			}
+			listFiles = (filterManager.isFiltred() ? filterListFile(list) : list);
+			sortListFile(listFiles);
+			log("-listFiles length:" + listFiles.length);
+			for(int i = 0 ; i<listFiles.length ; i++) {
+				log("-listFiles["+i+"]" + listFiles[i]);
 			}
 			for(int i = 0 ; i<listFiles.length ; i++) {
 				File file = listFiles[i];
@@ -525,7 +569,47 @@ public class MainActivity extends ActionBarActivity
 					break;
 				}
 			}
+			log("-listFiles idxFile:" + idxFile);
 			return null;
+		}
+
+		private File[] filterListFile(File[] list) {
+			ArrayList<File> arrayFile = new ArrayList<File>();
+			for(int i = 0 ; i<list.length ; i++) {
+				File file = list[i];
+				if (file.isFile()) {
+					try {
+						String extension = MimeTypeMap.getFileExtensionFromUrl(file.toURI().toURL().toString());
+						if (extension != null) {
+							String mimeType = MimeTypeMap.getSingleton().getMimeTypeFromExtension(extension);
+							log("-listFiles i:" + i + " extension:" + extension + " mimeType:" + mimeType + " file.path:" + file.getAbsolutePath());
+							if (mimeType != null && mimeType.toLowerCase(Locale.getDefault()).startsWith("image/")) {
+								arrayFile.add(file);
+							}
+						}
+					} catch (MalformedURLException e) {
+						e.printStackTrace();
+					}
+				}
+			}
+			return arrayFile.toArray(new File[0]);
+		}
+
+		private void sortListFile(File[] list) {
+			Arrays.sort(list, new Comparator<File>()
+			{
+			    public int compare(File o1, File o2) {
+
+			        if (((File)o1).lastModified() > ((File)o2).lastModified()) {
+			            return -1;
+			        } else if (((File)o1).lastModified() < ((File)o2).lastModified()) {
+			            return +1;
+			        } else {
+			            return 0;
+			        }
+			    }
+
+			});
 		}
 	}
 }

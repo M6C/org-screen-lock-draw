@@ -14,5 +14,11 @@
         android:title="@string/action_share_apk"
         android:icon="@drawable/ic_share_apk"
         app:showAsAction="never"/>
+
+    <item
+        android:id="@+id/action_filter"
+        android:orderInCategory="100"
+        android:title="@string/action_filter_on"
+        app:showAsAction="never"/>
     
 </menu>
