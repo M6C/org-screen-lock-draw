@@ -1,0 +1,15 @@
+ - English
+Title : Screen Lock To Draw
+Lock your screen with an image and draw the picture on a sheet
+
+
+1 - Select an image
+2 - Lock the screen
+3 - Reproduce the picture on a sheet by transparency
+
+ - Français
+Titre : Bloquer l'écran pour dessiner
+
+1 - Selectionner une image
+2 - Bloquer l'écran
+3 - Reproduire l'image sur une feuille par transparence
