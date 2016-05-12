@@ -28,6 +28,10 @@ public class LockManager {
 		outState.putBoolean(EXTRA_LOCKED, locked);
 	}
 
+	public static void clean() {
+		instance = null;
+	}
+
 	public boolean isLocked() {
 		return locked;
 	}

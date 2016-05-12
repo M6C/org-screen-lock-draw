@@ -137,6 +137,7 @@ public class MainActivity extends ActionBarActivity
 					.commit();
 		}
 	}
+
 	@Override
 	public void onBackPressed() {
 	    if (backPressedToExitOnce) {
@@ -166,6 +167,12 @@ public class MainActivity extends ActionBarActivity
 			lockManager.onSaveInstanceState(outState);
 			filterManager.onSaveInstanceState(outState);
 		}
+	}
+
+	@Override
+	public void finish() {
+		clean();
+		super.finish();
 	}
 
 	public void onSectionAttached(int number) {
@@ -289,6 +296,18 @@ public class MainActivity extends ActionBarActivity
 		        break;          
 	        }
 	    }
+	}
+
+	private void clean() {
+		uri = null;
+		path = null;
+		listFiles = null;
+		lockManager = null;
+		filterManager = null;
+		FilterManager.clean();
+		LockManager.clean();
+		HistoryManager.clean();
+		aq.clear();
 	}
 
 	private void setImage(Uri newUri, final boolean hitoryze, final boolean updListFile) {
