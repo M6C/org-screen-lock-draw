@@ -28,6 +28,10 @@ public class FilterManager {
 		outState.putBoolean(EXTRA_FILTER, filtred);
 	}
 
+	public static void clean() {
+		instance = null;
+	}
+
 	public boolean isFiltred() {
 		return filtred;
 	}

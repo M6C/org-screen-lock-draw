@@ -14,7 +14,7 @@ public class HistoryManager {
 
 	private static HistoryManager instance = null;
 	private List<String> history = new ArrayList<String>();
-	SharedPreferences prefs = null;
+	private SharedPreferences prefs = null;
 
 	public HistoryManager(Context context) {
 		prefs = context.getSharedPreferences(SHARED_KEY, Context.MODE_PRIVATE);
@@ -28,6 +28,10 @@ public class HistoryManager {
 		return instance;
 	}
 
+	public static void clean() {
+		instance = null;
+	}
+
 	public void addHistory(String arg) {
 		int idx = history.indexOf(arg);
 		if (idx >= 0) {
@@ -37,7 +41,7 @@ public class HistoryManager {
 		prefs.edit().putStringSet(SHARED_KEY_HISTORY, new HashSet<String>(history)).apply();
 	}
 
-	public void clean() {
+	public void cleanHistory() {
 		prefs.edit().remove(SHARED_KEY_HISTORY).apply();
 		history.clear();
 	}
