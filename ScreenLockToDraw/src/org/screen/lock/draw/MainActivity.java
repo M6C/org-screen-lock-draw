@@ -110,6 +110,10 @@ public class MainActivity extends ActionBarActivity
 				dialogFactory,
 				R.id.navigation_drawer,
 				(DrawerLayout) findViewById(R.id.drawer_layout));
+
+		if (uri == null) {
+			dialogFactory.showDialogChooseImageSource(activity);
+		}
 	}
 
 	@Override

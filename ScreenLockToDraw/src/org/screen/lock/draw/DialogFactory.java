@@ -43,14 +43,7 @@ public class DialogFactory {
 		    public void onClick(DialogInterface dialog, int which) {
 		        switch (which) {
 		        case 0:
-
-		            // GET IMAGE FROM THE GALLERY
-		            Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
-		            intent.setType("image/*");
-
-		            Intent chooser = Intent.createChooser(intent, "Choose a Picture");
-		            activity.startActivityForResult(chooser, ACTION_REQUEST_GALLERY);
-
+		            showGallery(activity);
 		            break;
 
 		        case 1:
@@ -93,5 +86,20 @@ public class DialogFactory {
 
 	public void setCameraPhotoURI(Uri cameraPhotoURI) {
 		this.cameraPhotoURI = cameraPhotoURI;
+	}
+
+	private void showGallery(final Activity activity) {
+		// GET IMAGE FROM THE GALLERY
+//            Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+//            intent.setType("image/*");
+//
+//            Intent chooser = Intent.createChooser(intent, "Choose a Picture");
+//            activity.startActivityForResult(chooser, ACTION_REQUEST_GALLERY);
+
+		Intent galleryIntent = new Intent(
+		        Intent.ACTION_PICK,
+		        android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+		galleryIntent.setType("image/*");
+		activity.startActivityForResult(galleryIntent, ACTION_REQUEST_GALLERY);
 	}
 }
