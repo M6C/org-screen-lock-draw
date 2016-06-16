@@ -4,8 +4,11 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 
+import org.screen.lock.draw.tool.ToolUri;
+
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.net.Uri;
 
 public class HistoryManager {
 	
@@ -14,11 +17,17 @@ public class HistoryManager {
 
 	private static HistoryManager instance = null;
 	private List<String> history = new ArrayList<String>();
+	private List<String> historyPath = new ArrayList<String>();
 	private SharedPreferences prefs = null;
+	private Context context;
 
 	public HistoryManager(Context context) {
+		this.context = context;
 		prefs = context.getSharedPreferences(SHARED_KEY, Context.MODE_PRIVATE);
 		history.addAll(prefs.getStringSet(SHARED_KEY_HISTORY, new HashSet<String>()));
+		for(String uri : history) {
+			historyPath.add(ToolUri.getPath(context, Uri.parse(uri)));
+		}
 	}
 
 	public static HistoryManager getInstance(Context context) {
@@ -36,21 +45,24 @@ public class HistoryManager {
 		int idx = history.indexOf(arg);
 		if (idx >= 0) {
 			history.remove(idx);
+			historyPath.remove(idx);
 		}
 		history.add(0, arg);
+		historyPath.add(0, ToolUri.getPath(context, Uri.parse(arg)));
 		prefs.edit().putStringSet(SHARED_KEY_HISTORY, new HashSet<String>(history)).apply();
 	}
 
 	public void cleanHistory() {
 		prefs.edit().remove(SHARED_KEY_HISTORY).apply();
 		history.clear();
+		historyPath.clear();
 	}
 
 	public List<String> getHistory() {
 		return history;
 	}
 
-	public void setHistory(List<String> history) {
-		this.history = history;
+	public List<String> getHistoryPath() {
+		return historyPath;
 	}
 }

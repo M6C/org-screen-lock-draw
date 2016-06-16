@@ -76,7 +76,7 @@ public class NavigationDrawerFragment extends Fragment {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
-		history = HistoryManager.getInstance(getActivity().getApplicationContext()).getHistory();
+		history = HistoryManager.getInstance(getActivity().getApplicationContext()).getHistoryPath();
 
 		// Read in the flag indicating whether or not the user has demonstrated
 		// awareness of the
