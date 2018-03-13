@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="action_clear_history">Clear History</string>
+    <string name="action_share_apk">Share Application</string>
+    <string name="action_filter_on">Filter Image [On]</string>
+    <string name="action_filter_off">Filter Image [Off]</string>
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+    <string name="navigation_drawer_title">History</string>
+    
+</resources>

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">Screen Lock To Draw</string>
+    <string name="action_rotate_left">Rotate Left</string>
+    <string name="action_rotate_right">Rotate Right</string>
+    <string name="action_open_image">Open Image</string>
+    <string name="action_move_right">Move Right</string>
+    <string name="action_move_left">Move Left</string>
+    <string name="action_move_up">Move Up</string>
+    <string name="action_move_down">Move Down</string>
+    <string name="action_lock">Lock</string>
+    <string name="action_unlock">Unlock</string>
+    <string name="press_again_to_exit">Press again to exit</string>
+    <string name="dialog_send_apk_title">Share Application</string>
+    <string name="dialog_send_apk_message">Share Application</string>
+    
+</resources>

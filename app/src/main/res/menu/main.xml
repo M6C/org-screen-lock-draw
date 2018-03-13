@@ -1,0 +1,58 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context="org.screen.lock.draw.MainActivity" >
+
+    <item
+        android:id="@+id/action_move_right"
+        android:title="@string/action_move_right"
+        android:icon="@drawable/ic_move_right"
+        android:visible="false"
+        app:showAsAction="always"/>
+
+    <item
+        android:id="@+id/action_move_left"
+        android:title="@string/action_move_left"
+        android:icon="@drawable/ic_move_left"
+        android:visible="false"
+        app:showAsAction="always"/>
+
+    <item
+        android:id="@+id/action_move_up"
+        android:title="@string/action_move_up"
+        android:icon="@drawable/ic_move_up"
+        android:visible="false"
+        app:showAsAction="always"/>
+
+    <item
+        android:id="@+id/action_move_down"
+        android:title="@string/action_move_down"
+        android:icon="@drawable/ic_move_down"
+        android:visible="false"
+        app:showAsAction="always"/>
+
+    <item
+        android:id="@+id/action_rotate_left"
+        android:title="@string/action_rotate_left"
+        android:icon="@drawable/ic_rotate_left"
+        app:showAsAction="always"/>
+
+    <item
+        android:id="@+id/action_rotate_right"
+        android:title="@string/action_rotate_right"
+        android:icon="@drawable/ic_rotate_right"
+        app:showAsAction="always"/>
+    
+    <item
+        android:id="@+id/action_open_image"
+        android:title="@string/action_open_image"
+        android:icon="@drawable/ic_open_image"
+        app:showAsAction="always"/>
+    
+    <item
+        android:id="@+id/action_lock_unlock"
+        android:title="@string/action_unlock"
+        android:icon="@drawable/ic_unlock"
+        app:showAsAction="always"/>
+
+</menu>
