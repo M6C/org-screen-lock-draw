@@ -76,7 +76,7 @@ public class NavigationDrawerFragment extends Fragment {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
-		history = HistoryManager.getInstance(getActivity().getApplicationContext()).getHistoryPath();
+		history = HistoryManager.getInstance(getActivity()).getHistoryPath();
 
 		// Read in the flag indicating whether or not the user has demonstrated
 		// awareness of the
@@ -288,7 +288,7 @@ public class NavigationDrawerFragment extends Fragment {
 
 		FragmentActivity context = getActivity();
 		if (item.getItemId() == R.id.action_clear_history) {
-			HistoryManager.getInstance(context.getApplicationContext()).cleanHistory();
+			HistoryManager.getInstance(context).cleanHistory();
 			refresh();
 			return true;
 		}

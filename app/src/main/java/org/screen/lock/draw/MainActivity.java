@@ -15,12 +15,14 @@ import org.screen.lock.draw.manager.HistoryManager;
 import org.screen.lock.draw.manager.LockManager;
 import org.screen.lock.draw.tool.ToolImage;
 import org.screen.lock.draw.tool.ToolImage.Direction;
+import org.screen.lock.draw.tool.ToolPermission;
 import org.screen.lock.draw.tool.ToolUri;
 import org.screen.lock.draw.view.TouchImageView;
 
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.drawable.AnimationDrawable;
 import android.graphics.drawable.BitmapDrawable;
@@ -130,7 +132,7 @@ public class MainActivity extends AppCompatActivity
 	@Override
 	public void onNavigationDrawerItemSelected(int position) {
 		if (ivMain != null) {
-			String str = HistoryManager.getInstance(getApplicationContext()).getHistory().get(position);
+			String str = HistoryManager.getInstance(this).getHistory().get(position);
 			Uri newUri = Uri.parse(str);
 			setImage(newUri, false, true);
 		} else {
@@ -331,7 +333,7 @@ public class MainActivity extends AppCompatActivity
 					new UpdateListFileTask().execute();
 				}
 				if (hitoryze) {
-					HistoryManager.getInstance(getApplicationContext()).addHistory(uri.toString());
+					HistoryManager.getInstance(MainActivity.this).addHistory(uri.toString());
 				}
 				return ToolUri.getPath(MainActivity.this, uri);
 			}
@@ -515,6 +517,23 @@ public class MainActivity extends AppCompatActivity
 		aq.id(R.id.ll_content).visible();
 		if (aq.id(R.id.progress_view) != null && aq.id(R.id.progress_view).getImageView() != null) {
 			((AnimationDrawable)aq.id(R.id.progress_view).getImageView().getBackground()).stop();
+		}
+	}
+	@Override
+	public void onRequestPermissionsResult(int requestCode,
+										   String[] permissions, int[] grantResults) {
+		switch (requestCode) {
+			case ToolPermission.MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE:
+				if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+					// do your stuff
+				} else {
+					Toast.makeText(MainActivity.this, "GET_ACCOUNTS Denied",
+							Toast.LENGTH_SHORT).show();
+				}
+				break;
+			default:
+				super.onRequestPermissionsResult(requestCode, permissions,
+						grantResults);
 		}
 	}
 

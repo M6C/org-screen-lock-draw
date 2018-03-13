@@ -4,8 +4,10 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 
+import org.screen.lock.draw.tool.ToolPermission;
 import org.screen.lock.draw.tool.ToolUri;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.net.Uri;
@@ -21,16 +23,19 @@ public class HistoryManager {
 	private SharedPreferences prefs = null;
 	private Context context;
 
-	public HistoryManager(Context context) {
+	public HistoryManager(Activity context) {
 		this.context = context;
 		prefs = context.getSharedPreferences(SHARED_KEY, Context.MODE_PRIVATE);
+		if (!ToolPermission.checkPermissionREAD_EXTERNAL_STORAGE(context)) {
+			return;
+		}
 		history.addAll(prefs.getStringSet(SHARED_KEY_HISTORY, new HashSet<String>()));
 		for(String uri : history) {
 			historyPath.add(ToolUri.getPath(context, Uri.parse(uri)));
 		}
 	}
 
-	public static HistoryManager getInstance(Context context) {
+	public static HistoryManager getInstance(Activity context) {
 		if (instance == null) {
 			instance = new HistoryManager(context);
 		}
