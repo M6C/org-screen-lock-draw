@@ -32,7 +32,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
-import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.AppCompatActivity;
 import android.view.GestureDetector;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -46,7 +46,7 @@ import android.widget.Toast;
 
 import com.androidquery.AQuery;
 
-public class MainActivity extends ActionBarActivity
+public class MainActivity extends AppCompatActivity
 		implements NavigationDrawerFragment.NavigationDrawerCallbacks {
 
 	private static final String EXTRA_IMAGE_URI = "EXTRA_IMAGE_URI";
@@ -499,16 +499,20 @@ public class MainActivity extends ActionBarActivity
 	}
 
 	private void startProgress() {
-		aq.id(R.id.ll_progress).visibility(View.VISIBLE);
-		aq.id(R.id.ll_content).visibility(View.INVISIBLE);
+//		aq.id(R.id.ll_progress).visibility(View.VISIBLE);
+//		aq.id(R.id.ll_content).visibility(View.INVISIBLE);
+		aq.id(R.id.ll_progress).visible();
+		aq.id(R.id.ll_content).invisible();
 		if (aq.id(R.id.progress_view) != null && aq.id(R.id.progress_view).getImageView() != null) {
 			((AnimationDrawable)aq.id(R.id.progress_view).getImageView().getBackground()).start();
 		}
 	}
 
 	private void stopProgress() {
-		aq.id(R.id.ll_progress).visibility(View.GONE);
-		aq.id(R.id.ll_content).visibility(View.VISIBLE);
+//		aq.id(R.id.ll_progress).visibility(View.GONE);
+//		aq.id(R.id.ll_content).visibility(View.VISIBLE);
+		aq.id(R.id.ll_progress).gone();
+		aq.id(R.id.ll_content).visible();
 		if (aq.id(R.id.progress_view) != null && aq.id(R.id.progress_view).getImageView() != null) {
 			((AnimationDrawable)aq.id(R.id.progress_view).getImageView().getBackground()).stop();
 		}
