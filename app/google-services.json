@@ -1,0 +1,42 @@
+{
+  "project_info": {
+    "project_number": "307020776120",
+    "firebase_url": "https://screen-lock-to-draw.firebaseio.com",
+    "project_id": "screen-lock-to-draw",
+    "storage_bucket": "screen-lock-to-draw.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:307020776120:android:182193b1785944f7",
+        "android_client_info": {
+          "package_name": "org.screen.lock.draw"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "307020776120-e614qv01b8nfbpcb6f33r7hk3oqcoe58.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAjtpfrIPlzbgQBrHwv6HucUFll-Z3HrL0"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
