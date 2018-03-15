@@ -36,6 +36,37 @@
           "status": 2
         }
       }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:307020776120:android:a4f5bff23881822c",
+        "android_client_info": {
+          "package_name": "draw.lock.screen.org.screenlocktodraw"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "307020776120-e614qv01b8nfbpcb6f33r7hk3oqcoe58.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAjtpfrIPlzbgQBrHwv6HucUFll-Z3HrL0"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
     }
   ],
   "configuration_version": "1"
