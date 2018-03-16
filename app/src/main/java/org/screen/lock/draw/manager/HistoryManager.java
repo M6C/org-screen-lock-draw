@@ -3,6 +3,7 @@ package org.screen.lock.draw.manager;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.screen.lock.draw.tool.ToolPermission;
 import org.screen.lock.draw.tool.ToolUri;
@@ -29,9 +30,13 @@ public class HistoryManager {
 		if (!ToolPermission.checkPermissionREAD_EXTERNAL_STORAGE(context)) {
 			return;
 		}
-		history.addAll(prefs.getStringSet(SHARED_KEY_HISTORY, new HashSet<String>()));
-		for(String uri : history) {
-			historyPath.add(ToolUri.getPath(context, Uri.parse(uri)));
+		Set<String> set = prefs.getStringSet(SHARED_KEY_HISTORY, new HashSet<String>());
+		for(String uri : set) {
+			String item = ToolUri.getPath(context, Uri.parse(uri));
+			if (item != null) {
+				historyPath.add(item);
+				history.add(uri);
+			}
 		}
 	}
 
@@ -47,8 +52,9 @@ public class HistoryManager {
 	}
 
 	public void addHistory(String arg) {
+		if (arg == null) return;
 		int idx = history.indexOf(arg);
-		if (idx >= 0) {
+		if (idx >= 0 && idx < history.size()) {
 			history.remove(idx);
 			historyPath.remove(idx);
 		}

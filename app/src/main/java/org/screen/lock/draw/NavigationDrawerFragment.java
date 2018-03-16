@@ -1,5 +1,6 @@
 package org.screen.lock.draw;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.screen.lock.draw.manager.HistoryManager;
@@ -64,7 +65,7 @@ public class NavigationDrawerFragment extends Fragment {
 	private int mCurrentSelectedPosition = 0;
 	private boolean mFromSavedInstanceState;
 	private boolean mUserLearnedDrawer;
-	private List<String> history = null;
+	private List<String> history = new ArrayList<>();
 
 	private DialogFactory dialogFactory;
 	private ArrayAdapter<String> mDrawerListAdapter;
@@ -76,7 +77,10 @@ public class NavigationDrawerFragment extends Fragment {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
-		history = HistoryManager.getInstance(getActivity()).getHistoryPath();
+		List<String> historyPath = HistoryManager.getInstance(getActivity()).getHistoryPath();
+		if (historyPath != null && !historyPath.isEmpty()) {
+			history.addAll(historyPath);
+		}
 
 		// Read in the flag indicating whether or not the user has demonstrated
 		// awareness of the

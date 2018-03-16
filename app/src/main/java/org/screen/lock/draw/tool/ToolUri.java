@@ -23,7 +23,8 @@ public class ToolUri {
 	        String[] projection = { MediaStore.Images.Media.DATA };
 	        Cursor cursor = context.getContentResolver().query(uri, projection, null, null, null);
 	        if (cursor == null) return null;
-	        int column_index = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
+			int column_index = getColumnIndex(cursor);
+			if (column_index == -1) return null;
 	        cursor.moveToFirst();
 	        ret =cursor.getString(column_index);
 	        cursor.close();
@@ -73,5 +74,24 @@ public class ToolUri {
             .fragment(uri.getRawFragment())
             .build();
 		return ret;
+	}
+
+	private static int getColumnIndex(Cursor cursor) {
+		int column_index = -1;
+		switch (cursor.getColumnCount()) {
+			case 0: {
+				break;
+			}
+			case 1: {
+				column_index = 0;
+				break;
+			}
+			default: try {
+				column_index = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
+			} catch (Exception ex) {
+				ex.printStackTrace();
+			}
+		}
+		return column_index;
 	}
 }
