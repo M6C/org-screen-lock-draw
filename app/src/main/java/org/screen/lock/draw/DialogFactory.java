@@ -21,6 +21,8 @@ import android.provider.MediaStore;
 import android.support.v4.content.FileProvider;
 import android.webkit.MimeTypeMap;
 
+import com.crashlytics.android.Crashlytics;
+
 import org.screen.lock.draw.tool.ToolPermission;
 
 public class DialogFactory {
@@ -44,12 +46,13 @@ public class DialogFactory {
 	public void showDialogChooseImageSource(final Activity activity) {
 		AlertDialog.Builder builder = new AlertDialog.Builder(activity);
 		builder.setTitle("Choose Image Source");
-		builder.setItems(new CharSequence[] {"Gallery", "Camera"}, 
-		        new DialogInterface.OnClickListener() {
+		final CharSequence[] items = {"Gallery", "Camera"};
+		builder.setItems(items,  new DialogInterface.OnClickListener() {
 
 			@Override
 		    public void onClick(DialogInterface dialog, int which) {
-		        switch (which) {
+				Crashlytics.log("Choice:" + items[which]);
+				switch (which) {
 		        case 0:
 		            showGallery(activity);
 		            break;
@@ -74,6 +77,7 @@ public class DialogFactory {
 					Intent intent = new Intent("android.media.action.IMAGE_CAPTURE");
 					intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
 		            File photo = new File(cameraFolder, imageFileName);
+		            Crashlytics.log("Camera file:" + photo.getAbsolutePath());
 					cameraPhotoURI = FileProvider.getUriForFile(activity, BuildConfig.APPLICATION_ID+".org.screen.lock.draw.provider", photo);
 					intent.putExtra(MediaStore.EXTRA_OUTPUT, cameraPhotoURI);
 

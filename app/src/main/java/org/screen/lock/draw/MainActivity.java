@@ -47,6 +47,7 @@ import android.webkit.MimeTypeMap;
 import android.widget.Toast;
 
 import com.androidquery.AQuery;
+import com.crashlytics.android.Crashlytics;
 
 public class MainActivity extends AppCompatActivity
 		implements NavigationDrawerFragment.NavigationDrawerCallbacks {
@@ -279,7 +280,7 @@ public class MainActivity extends AppCompatActivity
 		        case DialogFactory.ACTION_REQUEST_GALLERY: {
 		        	if (data != null && data.getExtras() != null) {
 		        		for(String key : data.getExtras().keySet()) {
-		        			System.out.println("key '" + key + "' => '" + data.getExtras().get(key) + "'");
+							log("Gallery result - key '" + key + "' => '" + data.getExtras().get(key) + "'");
 		        		}
 		        	}
 //key 'mimeType' => 'image/*'
@@ -289,6 +290,7 @@ public class MainActivity extends AppCompatActivity
 		        	if (data.hasExtra("selectedItems")) {
 		        		List<Uri> str = (List<Uri>) data.getSerializableExtra("selectedItems");
 		        		if (str != null && str.size() > 0) {
+							log("Gallery result selectedItems - path '" + str.get(0).getPath() + "'");
 		        			setImage(str.get(0), true, true);
 		        		}
 		        	}
@@ -297,7 +299,9 @@ public class MainActivity extends AppCompatActivity
 	
 		        case DialogFactory.ACTION_REQUEST_CAMERA: {
 //		        	ivMain.setImageURI(dialogFactory.getCameraPhotoURI());
-		        	setImage(dialogFactory.getCameraPhotoURI(), true, true);
+					Uri uri = dialogFactory.getCameraPhotoURI();
+					log("Camera result selectedItems - path '" + uri.getPath() + "'");
+		        	setImage(uri, true, true);
 		        }
 		        break;          
 	        }
@@ -539,6 +543,7 @@ public class MainActivity extends AppCompatActivity
 
 	private void log(String text) {
 		System.out.println(text);
+		Crashlytics.log(text);
 	}
 
 	public TouchImageView getIvMain() {
