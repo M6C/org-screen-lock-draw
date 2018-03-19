@@ -3,6 +3,7 @@ package org.screen.lock.draw;
 import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -11,9 +12,16 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.content.pm.ResolveInfo;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Environment;
 import android.provider.MediaStore;
+import android.support.v4.content.FileProvider;
+import android.webkit.MimeTypeMap;
+
+import org.screen.lock.draw.tool.ToolPermission;
 
 public class DialogFactory {
 
@@ -47,29 +55,29 @@ public class DialogFactory {
 		            break;
 
 		        case 1:
-		            Intent getCameraImage = new Intent("android.media.action.IMAGE_CAPTURE");
-
 		            File cameraFolder;
 
-		            if (android.os.Environment.getExternalStorageState().equals
-		                    (android.os.Environment.MEDIA_MOUNTED))
-		                cameraFolder = new File(android.os.Environment.getExternalStorageDirectory(),
-		                        "some_directory_to_save_images/");
-		            else
-		                cameraFolder= activity.getCacheDir();
-		            if(!cameraFolder.exists())
-		                cameraFolder.mkdirs();
+		            if (android.os.Environment.getExternalStorageState().equals(android.os.Environment.MEDIA_MOUNTED)) {
+						cameraFolder = new File(android.os.Environment.getExternalStorageDirectory(), "some_directory_to_save_images/");
+					}
+		            else {
+						cameraFolder = activity.getCacheDir();
+					}
+		            if(!cameraFolder.exists()) {
+						cameraFolder.mkdirs();
+					}
 
 		            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd'T'HHmmss");
 		            String timeStamp = dateFormat.format(new Date());
 		            String imageFileName = "picture_" + timeStamp + ".jpg";
 
-		            File photo = new File(Environment.getExternalStorageDirectory(), 
-		                    "some_directory_to_save_images/" + imageFileName);
-		            getCameraImage.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(photo));
-		            cameraPhotoURI = Uri.fromFile(photo);
+					Intent intent = new Intent("android.media.action.IMAGE_CAPTURE");
+					intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+		            File photo = new File(cameraFolder, imageFileName);
+					cameraPhotoURI = FileProvider.getUriForFile(activity, BuildConfig.APPLICATION_ID+".org.screen.lock.draw.provider", photo);
+					intent.putExtra(MediaStore.EXTRA_OUTPUT, cameraPhotoURI);
 
-		            activity.startActivityForResult(getCameraImage, ACTION_REQUEST_CAMERA);
+		            activity.startActivityForResult(intent, ACTION_REQUEST_CAMERA);
 
 		            break;
 

@@ -523,7 +523,7 @@ public class MainActivity extends AppCompatActivity
 	public void onRequestPermissionsResult(int requestCode,
 										   String[] permissions, int[] grantResults) {
 		switch (requestCode) {
-			case ToolPermission.MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE:
+			case ToolPermission.MY_PERMISSIONS_REQUEST:
 				if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
 					// do your stuff
 				} else {
