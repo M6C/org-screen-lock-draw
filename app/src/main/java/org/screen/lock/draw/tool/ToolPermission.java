@@ -18,11 +18,14 @@ import java.util.List;
 public class ToolPermission {
 	public static final int MY_PERMISSIONS_REQUEST = 123;
 
-	private ToolPermission() {
-	}
+	private ToolPermission() {}
 
 	public static boolean checkPermissionREAD_EXTERNAL_STORAGE(final Activity context) {
 		return checkPermission(context, Manifest.permission.READ_EXTERNAL_STORAGE);
+	}
+
+	public static boolean checkPermissionREAD_PHONE_STATE(final Activity activity) {
+		return checkPermission(activity, Manifest.permission.READ_PHONE_STATE);
 	}
 
 	public static void grantPermissionProvider(Context context, Intent intent, Uri uri) {
@@ -41,7 +44,7 @@ public class ToolPermission {
 					showDialog("External storage", context, permission);
 
 				} else {
-					ActivityCompat.requestPermissions((Activity) context, new String[] {permission}, MY_PERMISSIONS_REQUEST);
+					ActivityCompat.requestPermissions(context, new String[] {permission}, MY_PERMISSIONS_REQUEST);
 				}
 				return false;
 			} else {

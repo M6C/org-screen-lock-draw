@@ -18,7 +18,9 @@ buildscript {
         // Add this line
         classpath 'com.google.gms:google-services:3.2.0'
         // Firebase Crashlytics SDK
-        classpath 'io.fabric.tools:gradle:1.25.1'
+        classpath 'io.fabric.tools:gradle:1.25.2'
+        // Firebase Performance
+        classpath 'com.google.firebase:firebase-plugins:1.1.5'
     }
 }
 

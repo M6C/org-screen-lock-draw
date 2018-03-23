@@ -16,6 +16,7 @@ import org.screen.lock.draw.manager.LockManager;
 import org.screen.lock.draw.tool.ToolImage;
 import org.screen.lock.draw.tool.ToolImage.Direction;
 import org.screen.lock.draw.tool.ToolPermission;
+import org.screen.lock.draw.tool.ToolTrace;
 import org.screen.lock.draw.tool.ToolUri;
 import org.screen.lock.draw.view.TouchImageView;
 
@@ -48,6 +49,8 @@ import android.widget.Toast;
 
 import com.androidquery.AQuery;
 import com.crashlytics.android.Crashlytics;
+import com.google.firebase.perf.FirebasePerformance;
+import com.google.firebase.perf.metrics.Trace;
 
 public class MainActivity extends AppCompatActivity
 		implements NavigationDrawerFragment.NavigationDrawerCallbacks {
@@ -325,9 +328,12 @@ public class MainActivity extends AppCompatActivity
 		path = ToolUri.getPath(this, uri);
 		new AsyncTask<Void, Void, String>() {
 
+			private Trace myTrace;
+
 			@Override
 			protected void onPreExecute() {
 				super.onPreExecute();
+				myTrace = ToolTrace.startTracePerformance(MainActivity.this, "setImage");
 				startProgress();
 			}
 
@@ -355,6 +361,7 @@ public class MainActivity extends AppCompatActivity
 						stopProgress();
 					}
 				}, 1000);
+				ToolTrace.stopTracePerformance(myTrace);
 				super.onPostExecute(url);
 			}
 		}.execute();
@@ -455,9 +462,12 @@ public class MainActivity extends AppCompatActivity
 	private void rotate(final float degrees) {
 		new AsyncTask<Void, Void, Bitmap>() {
 
+			private Trace myTrace;
+
 			@Override
 			protected void onPreExecute() {
 				super.onPreExecute();
+				myTrace = ToolTrace.startTracePerformance(MainActivity.this, "rotate");
 				startProgress();
 			}
 
@@ -484,6 +494,7 @@ public class MainActivity extends AppCompatActivity
 				} else {
 					stopProgress();
 				}
+				ToolTrace.stopTracePerformance(myTrace);
 				super.onPostExecute(bmp);
 			}
 		}.execute();
@@ -598,6 +609,16 @@ public class MainActivity extends AppCompatActivity
 	}
 
 	private final class UpdateListFileTask extends AsyncTask<Void, Void, Void> {
+
+		private Trace myTrace;
+
+		@Override
+		protected void onPreExecute() {
+			super.onPreExecute();
+			myTrace = FirebasePerformance.getInstance().newTrace("UpdateListFileTask");
+			myTrace.start();
+		}
+
 		@Override
 		protected Void doInBackground(Void... params) {
 			idxFile = -1;
@@ -607,7 +628,6 @@ public class MainActivity extends AppCompatActivity
 			if (list == null) {
 				return null;
 			}
-			listFiles = (filterManager.isFiltred() ? filterListFile(list) : list);
 			sortListFile(listFiles);
 			log("-listFiles length:" + listFiles.length);
 			for(int i = 0 ; i<listFiles.length ; i++) {
@@ -622,6 +642,12 @@ public class MainActivity extends AppCompatActivity
 			}
 			log("-listFiles idxFile:" + idxFile);
 			return null;
+		}
+
+		@Override
+		protected void onPostExecute(Void aVoid) {
+			myTrace.stop();
+			super.onPostExecute(aVoid);
 		}
 
 		private File[] filterListFile(File[] list) {
