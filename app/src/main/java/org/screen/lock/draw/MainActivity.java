@@ -628,6 +628,7 @@ public class MainActivity extends AppCompatActivity
 			if (list == null) {
 				return null;
 			}
+			listFiles = (filterManager.isFiltred() ? filterListFile(list) : list);
 			sortListFile(listFiles);
 			log("-listFiles length:" + listFiles.length);
 			for(int i = 0 ; i<listFiles.length ; i++) {
