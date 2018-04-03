@@ -33,6 +33,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
@@ -112,13 +113,15 @@ public class MainActivity extends AppCompatActivity
 		mTitle = getTitle();
 
 		// Set up the drawer.
-		mNavigationDrawerFragment.setUp(
-				dialogFactory,
-				R.id.navigation_drawer,
-				(DrawerLayout) findViewById(R.id.drawer_layout));
+		DrawerLayout drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
+		mNavigationDrawerFragment.setUp(dialogFactory, R.id.navigation_drawer, drawerLayout);
 
 		if (uri == null) {
-			dialogFactory.showDialogChooseImageSource(activity);
+			if (HistoryManager.getInstance(this).getHistory().size() == 0) {
+				dialogFactory.showDialogChooseImageSource(activity);
+			} else {
+				drawerLayout.openDrawer(GravityCompat.START);
+			}
 		}
 	}
 
@@ -535,20 +538,21 @@ public class MainActivity extends AppCompatActivity
 		}
 	}
 	@Override
-	public void onRequestPermissionsResult(int requestCode,
-										   String[] permissions, int[] grantResults) {
+	public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+		if (grantResults == null || grantResults.length == 0) {
+			super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+			return;
+		};
 		switch (requestCode) {
 			case ToolPermission.MY_PERMISSIONS_REQUEST:
 				if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
 					// do your stuff
 				} else {
-					Toast.makeText(MainActivity.this, "GET_ACCOUNTS Denied",
-							Toast.LENGTH_SHORT).show();
+					Toast.makeText(MainActivity.this, "GET_ACCOUNTS Denied", Toast.LENGTH_SHORT).show();
 				}
 				break;
 			default:
-				super.onRequestPermissionsResult(requestCode, permissions,
-						grantResults);
+				super.onRequestPermissionsResult(requestCode, permissions, grantResults);
 		}
 	}
 

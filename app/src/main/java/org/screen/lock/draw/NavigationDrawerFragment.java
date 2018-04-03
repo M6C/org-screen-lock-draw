@@ -293,6 +293,7 @@ public class NavigationDrawerFragment extends Fragment {
 		FragmentActivity context = getActivity();
 		if (item.getItemId() == R.id.action_clear_history) {
 			HistoryManager.getInstance(context).cleanHistory();
+			history.clear();
 			refresh();
 			return true;
 		}

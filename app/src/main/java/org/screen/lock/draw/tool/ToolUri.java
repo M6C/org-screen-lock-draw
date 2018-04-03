@@ -25,6 +25,7 @@ public class ToolUri {
 	        if (cursor == null) return null;
 			int column_index = getColumnIndex(cursor);
 			if (column_index == -1) return null;
+			if (!(column_index < cursor.getCount())) return null;
 	        cursor.moveToFirst();
 	        ret =cursor.getString(column_index);
 	        cursor.close();

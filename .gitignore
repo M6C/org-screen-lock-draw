@@ -1,16 +1,20 @@
-/local.properties
-.DS_Store
-/build
-/captures
-.externalNativeBuild
-
 # Gradle local settings & cache
-.gradle
+.externalNativeBuild
 gradle.properties
+.gradle
+/build
 
 # Android Studio
+/local.properties
+/captures
 .idea
 *.iml
+
+# Apple's junk
+.DS_Store
+
+# Notepad++
+**/*.bak
 
 # Visual Studio Code
 **/.vscode
