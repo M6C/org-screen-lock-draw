@@ -328,6 +328,9 @@ public class MainActivity extends AppCompatActivity
 
 	private void setImage(Uri newUri, final boolean hitoryze, final boolean updListFile) {
 		uri = newUri;
+		if (uri == null) {
+			return;
+		}
 		path = ToolUri.getPath(this, uri);
 		new AsyncTask<Void, Void, String>() {
 

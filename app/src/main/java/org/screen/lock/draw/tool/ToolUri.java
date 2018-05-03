@@ -17,7 +17,9 @@ public class ToolUri {
 
 	public static String getPath(Context context, Uri uri) {
 		String ret = null;
-		if ("file".equals(uri.getScheme().toLowerCase(Locale.getDefault()))) {
+		if (uri == null || uri.getScheme() == null) {
+			return ret;
+		} else if ("file".equals(uri.getScheme().toLowerCase(Locale.getDefault()))) {
 			ret = uri.getPath();
 		} else if ("content".equals(uri.getScheme().toLowerCase(Locale.getDefault()))) {
 	        String[] projection = { MediaStore.Images.Media.DATA };
