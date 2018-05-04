@@ -306,7 +306,7 @@ public class MainActivity extends AppCompatActivity
 		        case DialogFactory.ACTION_REQUEST_CAMERA: {
 //		        	ivMain.setImageURI(dialogFactory.getCameraPhotoURI());
 					Uri uri = dialogFactory.getCameraPhotoURI();
-					log("Camera result selectedItems - path '" + uri.getPath() + "'");
+					log("Camera result selectedItems - path '" + (uri == null ? "" : uri.getPath()) + "'");
 		        	setImage(uri, true, true);
 		        }
 		        break;          

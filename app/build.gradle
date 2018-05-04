@@ -9,8 +9,8 @@ android {
         applicationId "draw.lock.screen.org.screenlocktodraw"
         minSdkVersion 21
         targetSdkVersion 27
-        versionCode 14
-        versionName "2.3.14"
+        versionCode 15
+        versionName "2.3.15"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
